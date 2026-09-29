@@ -172,3 +172,28 @@ tests/           — Test suite
 - Code is readable and maintainable
 - Performance is acceptable
 - User requirements are met
+
+## Cursor Cloud specific instructions
+
+The image already has Node 22, which is one of the CI lanes (`18.x`, `20.x`, `22.x`). `.tool-versions` pins Node `20.19.0` for asdf/mise; `package.json` `engines.node` is `>=18`. Do not install another Node unless a task needs that asdf pin.
+
+`yarn` on `PATH` may be Yarn Classic 1.x. This repo's `packageManager` is Yarn `4.9.2`. Install and reinstall with Corepack, matching CI (`YARN_ENABLE_SCRIPTS=false`, `--mode=skip-build`):
+
+```bash
+corepack enable
+corepack prepare yarn@4.9.2 --activate
+YARN_ENABLE_SCRIPTS=false corepack yarn install --immutable --mode=skip-build
+```
+
+That link step marks `scripts/memory-mcp.mjs` executable because it is the `ecc-memory-mcp` bin. Leave that mode-only change uncommitted.
+
+The Python package is `llm-abstraction` in `pyproject.toml` (Python `>=3.11`; the image has 3.12). Install dev extras with `python3 -m pip install --user -e '.[dev]'`. `~/.local/bin` is not on the default `PATH`, so run `python3 -m pytest`, `python3 -m ruff`, and `python3 -m mypy`. CI's unit-test command is `python3 -m pytest tests/test_*.py -m "not integration"`, then `python3 -m ruff check src tests` and `python3 -m mypy src`.
+
+Node checks used in CI: `npm test` (validators plus `node tests/run-all.js`), `npm run lint` (ESLint and markdownlint), and `npm run build:opencode` (TypeScript emit into gitignored `.opencode/dist`). Product CLI: `node scripts/ecc.js consult "<query>"` and `node scripts/ecc.js catalog`.
+
+`npm test` reports two failures only when the checkout path is the all-lowercase `/workspace`:
+
+- `tests/scripts/profile.test.js` rejects stdout that contains the absolute repo root. The relative path `skills/workspace-surface-audit/SKILL.md` contains the substring `/workspace`.
+- `tests/scripts/codex-hooks.test.js` treats `existsSync(filename.toLowerCase())` as proof of a case-insensitive filesystem. That is true for an already-lowercase path, so the macOS folded-case pre-push case runs on Linux and fails. On GitHub's `/home/runner/work/ECC/ECC` checkout the uppercase `ECC` segment makes the probe false and the case is skipped.
+
+Browser dashboard: `npm run dashboard:web` (or `node scripts/dashboard-web.js`). It listens on `127.0.0.1:3456`. `ECC_DASHBOARD_HOST` must stay loopback. Data is `GET /api/data`. The search box is `#search`.
