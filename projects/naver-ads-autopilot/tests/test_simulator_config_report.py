@@ -46,7 +46,7 @@ class ConfigTests(unittest.TestCase):
         cfg = load_config(str(ROOT / "config.example.toml"))
         s = cfg.sites["site_a"]
         self.assertEqual((s.target_roas_pct, s.level, s.campaign_types, s.daily_budget_cap),
-                         (2000, "ad", ["SHOPPING"], 400_000))
+                         (2500, "ad", ["SHOPPING"], 400_000))
         self.assertEqual((s.cost_multiplier, s.stat_conversions_field, s.stat_revenue_field),
                          (1.0, "purchaseCcnt", "purchaseConvAmt"))
         self.assertEqual((cfg.global_.utc_offset_hours, cfg.global_.total_daily_cap), (9, 400_000))

@@ -26,8 +26,9 @@ ad_types = ["SHOPPING_PRODUCT_AD"]       # level = "ad" 일 때 대상 소재 �
 stat_conversions_field = "purchaseCcnt"
 stat_revenue_field = "purchaseConvAmt"
 
-# 목표: 사이트 전체 ROAS 2,000%
-target_roas_pct = 2000
+# 목표: 쇼핑검색 단독 ROAS 2,500% (구매완료 전환매출 / 광고비).
+# 쇼핑검색+ADVoost 합계 "Total 2,000%"는 ADVoost가 API에 없어 이 프로그램이 직접 맞출 수 없습니다(별도 관리).
+target_roas_pct = 2500
 # avg_order_value = 30000       # 평균 객단가(원). 비우면 최근 실적에서 계산
 daily_budget_cap = 400000       # 사이트 일 광고비 상한(VAT 포함, 원)
 # backstop_campaign_budget = 400000   # (선택) 네이버 캠페인 일 예산도 설정. 봇이 멈춰도 상한 유지.
@@ -40,7 +41,7 @@ roas_lag_adjust = 1.0           # 전환이 늦게 잡혀 ROAS 가 낮게 보이
 # 누수 판정
 leak_multiplier = 3.0           # 광고비 >= max(leak_min_cost, 3 x 허용CPA) 인데 전환 0 이면 OFF
 leak_min_cost = 10000
-stoploss_ratio = 0.3            # ROAS 가 목표(2,000%)의 30%(=600%) 미만이면 OFF
+stoploss_ratio = 0.3            # ROAS 가 목표(2,500%)의 30%(=750%) 미만이면 OFF
 probe_threshold_factor = 0.5    # 재진입한 광고는 절반 임계로 더 빨리 판정
 
 # 입찰 조정 (상품 소재는 클릭이 적어 같은 광고그룹의 평균 클릭당 매출로 보정합니다)
@@ -64,7 +65,7 @@ max_resumes_per_run = 3
 
 # 안전장치
 max_off_pct_per_day = 0.25      # 24시간 동안 활성 광고의 25% 를 넘는 OFF 는 승인 대기
-defensive_ratio = 0.5           # 사이트 ROAS 가 목표의 50%(=1,000%) 미만이면 입찰 상향/재진입 금지
+defensive_ratio = 0.5           # 사이트 ROAS 가 목표의 50%(=1,250%) 미만이면 입찰 상향/재진입 금지
 sanity_min_cost = 30000         # 이 이상 썼는데 전환 0 이면 전환추적 장애로 보고 동결
 max_actions_per_run = 200
 
@@ -79,5 +80,5 @@ protected_name_prefix = "[MANUAL]"
 # api_key_env = "NAVER_SA_API_KEY_B"
 # secret_env = "NAVER_SA_SECRET_B"
 # level = "ad"
-# target_roas_pct = 2000
+# target_roas_pct = 2500
 # daily_budget_cap = 200000     # 두 사이트 합계는 global.total_daily_cap 으로도 제한됩니다
