@@ -45,8 +45,12 @@ class ConfigTests(unittest.TestCase):
     def test_example_config_loads(self):
         cfg = load_config(str(ROOT / "config.example.toml"))
         s = cfg.sites["site_a"]
-        self.assertEqual((s.target_roas_pct, s.level, s.campaign_types), (500, "adgroup", ["SHOPPING"]))
-        self.assertEqual(cfg.global_.utc_offset_hours, 9)
+        self.assertEqual((s.target_roas_pct, s.level, s.campaign_types, s.daily_budget_cap),
+                         (2000, "ad", ["SHOPPING"], 400_000))
+        self.assertEqual((s.cost_multiplier, s.stat_conversions_field, s.stat_revenue_field),
+                         (1.0, "purchaseCcnt", "purchaseConvAmt"))
+        self.assertEqual((cfg.global_.utc_offset_hours, cfg.global_.total_daily_cap), (9, 400_000))
+        self.assertEqual(cfg.global_.webhook_url_envs, ["SLACK_WEBHOOK_URL", "DISCORD_WEBHOOK_URL"])
 
     def test_typos_are_errors(self):
         path = self.write("[sites.a]\ntarget_roas = 400\n")

@@ -9,18 +9,19 @@
 
 | 항목 | 상태 |
 | --- | --- |
-| 판단 엔진 (누수 OFF, 입찰 조정, 예산 방어, 스케줄, 재진입) | 구현, 단위·통합 테스트 71개 통과 |
+| 판단 엔진 (누수 OFF, 입찰 조정, 예산 방어, 스케줄, 재진입) | 구현, 테스트 91개 통과 |
 | 가상 시장 시뮬레이션 | 구현. 로직 검증용이며 실제 성과의 증거가 아님 |
-| API 서명 (HMAC-SHA256) | 공식 샘플 알고리즘과 동일함을 테스트로 확인 |
-| 광고그룹·키워드 조회, ON/OFF, 입찰가 변경 호출 형식 | 공식 샘플 기준으로 구현. 실계정 호출은 아직 안 함 |
-| `/stats` 전환 필드명 (`ccnt`, `convAmt`), 캠페인 일 예산 변경 | 미검증. `probe`로 확인 후 설정 |
-| 쇼핑 상품(소재) 단위 입찰, 상품 등록 자동화, 웹 대시보드 | 미구현 (기획안 Phase 2~4) |
+| API 서명, 광고그룹·키워드·소재 조회, ON/OFF, 광고그룹 입찰, 캠페인 일 예산 | 공식 샘플과 Swagger 스펙 기준으로 구현. **실계정 호출은 아직 안 함** |
+| 쇼핑 상품(소재) 단위 입찰 | 구현. 소재의 입찰 정보(`adAttr`) 구조는 스펙에 자세히 없어 `probe`로 확인 필요 |
+| `/stats` 구매 전환 필드 (`purchaseCcnt`, `purchaseConvAmt`) | 공식 스펙에 문서화됨. 다중 ID 요청에서 허용되는지는 `probe`가 확인 |
+| Slack / Discord 알림, 일일 요약 전송, 전체 일 예산 상한 | 구현 |
+| 상품 등록 자동화, 웹 대시보드 | 미구현 (기획안 Phase 4) |
 
 실계정에 처음 연결할 때는 반드시 아래 "안전하게 시작하기" 순서를 따르세요.
 
 ## 빠른 시작
 
-Python 3.11 이상, 외부 패키지 없음(표준 라이브러리만 사용).
+Python 3.11 이상 권장(테스트는 3.11에서만 실행함), 외부 패키지 없음(표준 라이브러리만 사용). 3.11 미만이면 `pip install tomli`가 필요하지만 그 환경은 검증하지 않았습니다.
 
 ```bash
 cd projects/naver-ads-autopilot
@@ -41,7 +42,11 @@ python3 -m unittest discover -s tests -t .
    export NAVER_SA_CUSTOMER_A=...   # 고객 ID
    export NAVER_SA_API_KEY_A=...    # 액세스 라이선스
    export NAVER_SA_SECRET_A=...     # 비밀키
+   export SLACK_WEBHOOK_URL=...     # (선택) Slack 알림
+   export DISCORD_WEBHOOK_URL=...   # (선택) Discord 알림
    ```
+
+   예제 설정은 스마트스토어 쇼핑검색광고 기준입니다: 소재 단위(`level = "ad"`), 목표 ROAS 2,000%, 일 광고비 상한 40만 원(전체 합산).
 
 2. Phase 0 - `probe`로 실계정 응답 모양을 확인합니다 (읽기 전용). 출력의 키 값은 비밀이 아니지만, 공유 전에 광고주 정보가 없는지 확인하세요.
 
@@ -49,8 +54,12 @@ python3 -m unittest discover -s tests -t .
    python3 -m autopilot probe --site site_a
    ```
 
-   확인할 것: `campaignTp` 값(예: `SHOPPING`), `/stats` 응답의 전환·전환매출 필드 이름, 광고비(VAT 제외 여부).
-   다르면 `config.toml`과 `NaverSearchAdClient(stat_fields=...)`를 맞춥니다.
+   확인할 것:
+
+   - `campaignTp` 값(예: `SHOPPING`)과 `ad_types_seen`(예: `SHOPPING_PRODUCT_AD`)
+   - `stats_fields.accepted`에 `purchaseCcnt`, `purchaseConvAmt`가 있는지. 없으면 `config.toml`의 `stat_conversions_field`, `stat_revenue_field`를 맞춥니다.
+   - `ads_sample`의 `adAttr`에 `bidAmt`가 들어 있는지 (소재 입찰 변경이 이 구조에 의존합니다).
+   - 광고비 `salesAmt`는 공식 스펙상 VAT 포함이라 `cost_multiplier = 1.0`이 맞습니다.
 
 3. Phase 1 - 섀도 모드. 기본값이 dry-run이라 아무것도 바꾸지 않고 "하려던 일"만 기록합니다. 2주 동안 매시 실행하고, 사람이 하던 조정과 비교하세요.
 
@@ -74,7 +83,30 @@ python3 -m unittest discover -s tests -t .
    python3 -m autopilot kill --resume
    ```
 
-운영 시에는 cron 등으로 매시 `run --live`, 매일 아침 `report`를 실행합니다.
+## VPS에서 운영하기
+
+VPS를 권장합니다. 24시간 켜져 있고 IP가 고정이라, 나중에 커머스 API(고정 IP 필요)를 붙일 때도 그대로 쓸 수 있습니다. Mac mini도 가능하지만 절전, 재부팅, 가정용 회선 끊김을 직접 관리해야 합니다. 검색광고 API 자체의 IP 제한 여부는 공식 자료에서 확인하지 못했으니 `probe`가 성공하는지로 확인하세요.
+
+```bash
+git clone <저장소> /opt/ECC && cd /opt/ECC/projects/naver-ads-autopilot
+python3 --version                       # 3.11 이상인지 확인
+cp config.example.toml config.toml      # 값 수정
+cp deploy/autopilot.env.example ~/.config/naver-ads-autopilot.env
+chmod 600 ~/.config/naver-ads-autopilot.env   # 키와 웹훅 URL 입력
+crontab -e                              # deploy/crontab.example 내용 붙여넣기
+```
+
+- `deploy/run.sh`가 저장소 밖의 환경변수 파일을 읽어 실행합니다 (키가 저장소나 크론 줄에 남지 않음).
+- 매시 5분에 `run`, 매일 10:00에 `report --send`를 실행합니다. 10:10경 확인하는 기존 루틴 직전에 요약이 도착합니다.
+- 처음 2주는 `--live` 없이 돌리세요.
+
+## 목표 ROAS 2,000%에 대한 주의
+
+2,000%는 광고비가 매출의 5%라는 뜻이라 공격적인 목표입니다. 이 목표에서는 대부분의 소재가 목표 미달로 판정되어 입찰이 하한으로 수렴하고, 승인 대기(OFF 제안)가 많이 쌓일 수 있으며, 매출(볼륨)이 줄 수 있습니다. 섀도 모드(dry-run) 2주 동안 다음을 먼저 확인하세요.
+
+- 현재 실제 ROAS와 소재별 분포 (목표 대비 몇 %가 미달인지)
+- 입찰을 낮추면 매출이 얼마나 줄어드는지
+- 승인 대기 건수가 하루 몇 건인지 (`max_off_pct_per_day`, `stoploss_ratio` 조정 근거)
 
 ## 어떻게 판단하나
 
@@ -92,7 +124,7 @@ python3 -m unittest discover -s tests -t .
 설계 포인트:
 
 - **입찰은 마지막 변경 이후 데이터로만 판단**합니다. 입찰을 바꾼 뒤에도 14일 창에 옛 높은 CPC가 남아 계속 깎이는 진동을 막기 위해서이며, 누수(무전환) 판정만 전체 창을 씁니다.
-- **소표본 보정**: 클릭이 적은 광고는 사이트 평균 클릭당 매출로 끌어당겨 노이즈에 덜 흔들립니다. 클릭 30 미만은 아예 바꾸지 않습니다.
+- **소표본 보정**: 클릭이 적은 소재·키워드는 같은 광고그룹(데이터가 부족하면 사이트) 평균 클릭당 매출로 끌어당겨 노이즈에 덜 흔들립니다. 클릭 30 미만은 아예 바꾸지 않습니다.
 - **오탐 방지**: 사이트 전체 전환이 0인데 광고비가 크면 전환추적 장애로 보고 모든 성과 기반 조정을 멈춥니다. 데이터 수집이 실패하면 아무것도 바꾸지 않고 중단합니다.
 - **대량 OFF는 사람 승인**: 24시간 동안 활성 광고의 25%를 넘는 OFF는 승인 대기로 보류합니다. 거절한 항목은 7일간 다시 올리지 않습니다.
 - 사람이 직접 끈 광고, `[MANUAL]`로 시작하는 광고, `protected_ids`는 건드리지 않습니다.

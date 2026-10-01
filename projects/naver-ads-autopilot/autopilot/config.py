@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:  # Python < 3.11: pip install tomli
+    import tomli as tomllib
 from dataclasses import dataclass, field, fields
 from pathlib import Path
 from typing import Optional
@@ -22,8 +25,14 @@ class SiteConfig:
     api_key_env: str = ""
     secret_env: str = ""
 
-    level: str = "adgroup"  # "adgroup" | "keyword"
+    level: str = "adgroup"  # "adgroup" | "keyword" | "ad" (shopping product ads)
     campaign_types: list = field(default_factory=lambda: ["SHOPPING"])
+    ad_types: list = field(default_factory=lambda: ["SHOPPING_PRODUCT_AD"])  # used when level == "ad"
+
+    # /stats field names. Defaults follow the official spec (purchase conversions);
+    # run `probe` to confirm they are accepted for your account.
+    stat_conversions_field: str = "purchaseCcnt"
+    stat_revenue_field: str = "purchaseConvAmt"
 
     # goal
     target_roas_pct: float = 400.0
@@ -33,7 +42,7 @@ class SiteConfig:
 
     # evaluation window
     lookback_days: int = 14
-    cost_multiplier: float = 1.1  # reported cost excludes VAT; revenue includes it
+    cost_multiplier: float = 1.0  # /stats salesAmt already includes VAT (official spec); keep 1.0
     roas_lag_adjust: float = 1.0  # >1 compensates for late-arriving conversions
 
     # leak / stop-loss
@@ -79,7 +88,8 @@ class GlobalConfig:
     db_path: str = "autopilot.db"
     kill_switch_file: str = "KILL"
     utc_offset_hours: int = 9  # KST
-    webhook_url_env: str = ""
+    webhook_url_envs: list = field(default_factory=list)  # env var names holding Slack/Discord webhook URLs
+    total_daily_cap: Optional[int] = None  # KRW across all sites, VAT-inclusive
     request_min_interval: float = 0.25
 
 
@@ -99,10 +109,12 @@ def _build(cls, data: dict, where: str):
 
 def validate_site(s: SiteConfig) -> None:
     where = f"sites.{s.key}"
-    if s.level not in ("adgroup", "keyword"):
-        raise ConfigError(f"{where}.level must be 'adgroup' or 'keyword'")
+    if s.level not in ("adgroup", "keyword", "ad"):
+        raise ConfigError(f"{where}.level must be 'adgroup', 'keyword' or 'ad'")
     if s.target_roas_pct <= 0:
         raise ConfigError(f"{where}.target_roas_pct must be > 0")
+    if s.cost_multiplier <= 0:
+        raise ConfigError(f"{where}.cost_multiplier must be > 0")
     if s.daily_budget_cap <= 0:
         raise ConfigError(f"{where}.daily_budget_cap must be > 0")
     if not (0 < s.max_step_pct <= 0.5):
@@ -132,4 +144,6 @@ def load_config(path: str) -> Config:
         sites[key] = site
     if not sites:
         raise ConfigError("no [sites.*] sections found")
+    if global_.total_daily_cap is not None and global_.total_daily_cap <= 0:
+        raise ConfigError("global.total_daily_cap must be > 0")
     return Config(global_=global_, sites=sites)

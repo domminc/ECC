@@ -1,14 +1,16 @@
 """Naver Search Ad API client (stdlib only).
 
-Verified against the official sample (github.com/naver/searchad-apidoc):
+Verified against the official sample and Swagger spec (naver/searchad-apidoc):
   * signature = Base64(HMAC-SHA256(secret, "{timestamp}.{METHOD}.{path}"))
-  * GET /ncc/campaigns, /ncc/adgroups, /ncc/keywords, GET /stats call shape
-  * PUT /ncc/adgroups/{id}?fields=userLock|bidAmt, PUT /ncc/keywords?fields=...
+  * GET /ncc/campaigns, /ncc/adgroups, /ncc/keywords, /ncc/ads, GET /stats call shape
+  * PUT /ncc/adgroups/{id}?fields=userLock|bidAmt|budget, PUT /ncc/keywords?fields=...
+  * PUT /ncc/ads/{id}?fields=userLock, PUT /ncc/campaigns/{id}?fields=budget
+  * /stats salesAmt is VAT-inclusive; purchase conversions are purchaseCcnt / purchaseConvAmt
   * error code 1016 = too many connections (treated like HTTP 429)
 
-NOT yet verified against a live account (run `probe` first): the conversion
-field names returned by /stats and the campaign budget update. Field names are
-therefore configurable through `stat_fields`.
+NOT verifiable without a live account (run `probe` first): the exact shape of a
+shopping ad's `adAttr` (bid information) and whether the purchase fields are
+accepted by /stats for multiple ids. Both are isolated in small helpers below.
 """
 
 from __future__ import annotations
@@ -32,10 +34,14 @@ BASE_URL = "https://api.searchad.naver.com"
 DEFAULT_STAT_FIELDS = {
     "impressions": "impCnt",
     "clicks": "clkCnt",
-    "cost": "salesAmt",
-    "conversions": "ccnt",
-    "revenue": "convAmt",
+    "cost": "salesAmt",  # VAT included
+    "conversions": "purchaseCcnt",
+    "revenue": "purchaseConvAmt",
 }
+
+# Candidates `probe` tries one by one when a combined /stats request is rejected.
+PROBE_STAT_FIELDS = ["impCnt", "clkCnt", "salesAmt", "ccnt", "convAmt", "purchaseCcnt", "purchaseConvAmt",
+                     "purchaseRor"]
 
 
 class ApiError(RuntimeError):
@@ -75,6 +81,31 @@ def _is_rate_limited(status: int, payload) -> bool:
     return status == 429 or (isinstance(payload, dict) and payload.get("code") == 1016)
 
 
+def _adattr(ad: dict):
+    """Return (attr_dict, was_json_string). The spec types adAttr as a string in responses."""
+    raw = ad.get("adAttr")
+    if isinstance(raw, str):
+        try:
+            return json.loads(raw), True
+        except ValueError:
+            return {}, True
+    return (raw if isinstance(raw, dict) else {}), False
+
+
+def _ad_name(ad: dict, group_name: str) -> str:
+    creative = ad.get("ad")
+    if isinstance(creative, str):
+        try:
+            creative = json.loads(creative)
+        except ValueError:
+            creative = None
+    if isinstance(creative, dict):
+        for key in ("productName", "name", "title", "headline"):
+            if creative.get(key):
+                return str(creative[key])
+    return f"{group_name} / {ad['nccAdId']}"
+
+
 def _chunks(items: list, size: int):
     for i in range(0, len(items), size):
         yield items[i:i + size]
@@ -82,7 +113,8 @@ def _chunks(items: list, size: int):
 
 class NaverSearchAdClient:
     def __init__(self, api_key: str, secret: str, customer_id: str, *, level: str = "adgroup",
-                 campaign_types=("SHOPPING",), stat_fields: Optional[dict] = None, stat_chunk: int = 50,
+                 campaign_types=("SHOPPING",), ad_types=("SHOPPING_PRODUCT_AD",),
+                 stat_fields: Optional[dict] = None, stat_chunk: int = 50,
                  transport: Callable = urllib_transport, sleep: Callable = time.sleep,
                  clock: Callable = time.time, min_interval: float = 0.25, max_retries: int = 5,
                  backoff_base: float = 2.0):
@@ -91,6 +123,7 @@ class NaverSearchAdClient:
         self.customer_id = str(customer_id)
         self.level = level
         self.campaign_types = tuple(campaign_types or ())
+        self.ad_types = tuple(ad_types or ())
         self.stat_fields = {**DEFAULT_STAT_FIELDS, **(stat_fields or {})}
         self.stat_chunk = stat_chunk
         self._transport = transport
@@ -150,6 +183,20 @@ class NaverSearchAdClient:
                     continue
                 gid = grp["nccAdgroupId"]
                 grp_on = not grp.get("userLock")
+                if self.level == "ad":
+                    for ad in self._request("GET", "/ncc/ads", params={"nccAdgroupId": gid}) or []:
+                        if ad.get("delFlag") or ad.get("status") == "DELETED":
+                            continue
+                        if self.ad_types and ad.get("type") not in self.ad_types:
+                            continue
+                        attr, _ = _adattr(ad)
+                        uses_group = bool(attr.get("useGroupBidAmt"))
+                        bid = int(grp.get("bidAmt") or 0) if uses_group else int(attr.get("bidAmt") or 0)
+                        units.append(Unit(
+                            id=ad["nccAdId"], name=_ad_name(ad, grp.get("name", gid)), level="ad",
+                            campaign_id=cid, on=not ad.get("userLock"), bid=bid, parent_on=camp_on and grp_on,
+                            uses_group_bid=uses_group, campaign_daily_budget=budget, adgroup_id=gid))
+                    continue
                 if self.level == "adgroup":
                     units.append(Unit(
                         id=gid, name=grp.get("name", gid), level="adgroup", campaign_id=cid,
@@ -196,7 +243,11 @@ class NaverSearchAdClient:
         return locked if isinstance(current, bool) else int(locked)
 
     def set_unit_on(self, unit: Unit, on: bool) -> None:
-        if unit.level == "adgroup":
+        if unit.level == "ad":
+            obj = self._request("GET", f"/ncc/ads/{unit.id}")
+            obj["userLock"] = self._flag(obj.get("userLock"), not on)
+            self._request("PUT", f"/ncc/ads/{unit.id}", params={"fields": "userLock"}, body=obj)
+        elif unit.level == "adgroup":
             obj = self._request("GET", f"/ncc/adgroups/{unit.id}")
             obj["userLock"] = self._flag(obj.get("userLock"), not on)
             self._request("PUT", f"/ncc/adgroups/{unit.id}", params={"fields": "userLock"}, body=obj)
@@ -206,7 +257,17 @@ class NaverSearchAdClient:
             self._request("PUT", "/ncc/keywords", params={"fields": "userLock"}, body=[obj])
 
     def set_bid(self, unit: Unit, bid: int) -> None:
-        if unit.level == "adgroup":
+        if unit.level == "ad":
+            # The spec lists only userLock/inspect as `fields` for ads, and marks adAttr (the bid
+            # information of shopping ads) as required on update, so the whole ad is sent back.
+            obj = self._request("GET", f"/ncc/ads/{unit.id}")
+            attr, was_string = _adattr(obj)
+            attr["bidAmt"] = int(bid)
+            if "useGroupBidAmt" in attr:
+                attr["useGroupBidAmt"] = self._flag(attr["useGroupBidAmt"], False)
+            obj["adAttr"] = json.dumps(attr) if was_string else attr
+            self._request("PUT", f"/ncc/ads/{unit.id}", body=obj)
+        elif unit.level == "adgroup":
             obj = self._request("GET", f"/ncc/adgroups/{unit.id}")
             obj["bidAmt"] = int(bid)
             self._request("PUT", f"/ncc/adgroups/{unit.id}", params={"fields": "bidAmt"}, body=obj)
@@ -223,21 +284,46 @@ class NaverSearchAdClient:
         self._request("PUT", f"/ncc/campaigns/{campaign_id}", params={"fields": "budget"}, body=obj)
 
     # ---- diagnostics
+    def _probe_stats(self, ids: list, since: date, until: date) -> dict:
+        """Which /stats fields does this account accept? Tries all at once, then one by one."""
+        def call(fields):
+            return self._request("GET", "/stats", params={
+                "ids": ids, "fields": json.dumps(fields),
+                "timeRange": json.dumps({"since": since.isoformat(), "until": until.isoformat()})})
+
+        try:
+            return {"accepted": PROBE_STAT_FIELDS, "rows": call(PROBE_STAT_FIELDS)}
+        except RateLimited:
+            raise
+        except ApiError as err:
+            out: dict = {"combined_error": str(err), "accepted": [], "rejected": {}, "rows": {}}
+            for name in PROBE_STAT_FIELDS:
+                try:
+                    out["rows"][name] = call([name])
+                    out["accepted"].append(name)
+                except RateLimited:
+                    raise
+                except ApiError as single:
+                    out["rejected"][name] = str(single)
+            return out
+
     def probe(self, today: date, sample: int = 3) -> dict:
-        """Dump raw API shapes so field names can be confirmed before going live."""
+        """Dump raw API shapes so field names can be confirmed before going live (read-only)."""
         result: dict = {"campaigns": self._request("GET", "/ncc/campaigns")}
         camps = [c for c in result["campaigns"] or []
                  if not self.campaign_types or c.get("campaignTp") in self.campaign_types]
         result["campaigns_matching_filter"] = len(camps)
-        if camps:
-            groups = self._request("GET", "/ncc/adgroups", params={"nccCampaignId": camps[0]["nccCampaignId"]})
-            result["adgroups_sample"] = (groups or [])[:sample]
-            ids = [g["nccAdgroupId"] for g in (groups or [])[:sample]]
-            if ids:
-                since = date.fromordinal(today.toordinal() - 7)
-                result["stats_sample"] = self._request("GET", "/stats", params={
-                    "ids": ids,
-                    "fields": json.dumps(list(self.stat_fields.values())),
-                    "timeRange": json.dumps({"since": since.isoformat(), "until": today.isoformat()}),
-                })
+        if not camps:
+            return result
+        groups = self._request("GET", "/ncc/adgroups", params={"nccCampaignId": camps[0]["nccCampaignId"]}) or []
+        result["adgroups_sample"] = groups[:sample]
+        stat_ids = [g["nccAdgroupId"] for g in groups[:sample]]
+        if groups:
+            ads = self._request("GET", "/ncc/ads", params={"nccAdgroupId": groups[0]["nccAdgroupId"]}) or []
+            result["ads_sample"] = ads[:sample]
+            result["ad_types_seen"] = sorted({a.get("type") for a in ads})
+            stat_ids += [a["nccAdId"] for a in ads[:sample]]
+        if stat_ids:
+            since = date.fromordinal(today.toordinal() - 7)
+            result["stats_fields"] = self._probe_stats(stat_ids, since, date.fromordinal(today.toordinal() - 1))
         return result

@@ -7,7 +7,10 @@ NOW = datetime(2026, 3, 10, 12, 0)
 
 
 def site(**overrides) -> SiteConfig:
-    base = dict(key="t", target_roas_pct=400, avg_order_value=30000, daily_budget_cap=100_000)
+    # cost_multiplier=1.1 on purpose: the engine tests exercise the VAT-multiplier path.
+    # The real default (1.0, salesAmt is VAT-inclusive) is covered in test_defaults.
+    base = dict(key="t", target_roas_pct=400, avg_order_value=30000, daily_budget_cap=100_000,
+                cost_multiplier=1.1)
     return SiteConfig(**{**base, **overrides})
 
 

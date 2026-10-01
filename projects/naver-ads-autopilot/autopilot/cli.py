@@ -28,7 +28,24 @@ def _client_for(cfg: Config, site: SiteConfig) -> NaverSearchAdClient:
         raise ConfigError(f"sites.{site.key}: 환경변수가 비어 있습니다: {missing}")
     return NaverSearchAdClient(
         os.environ[site.api_key_env], os.environ[site.secret_env], os.environ[site.customer_id_env],
-        level=site.level, campaign_types=site.campaign_types, min_interval=cfg.global_.request_min_interval)
+        level=site.level, campaign_types=site.campaign_types, ad_types=site.ad_types,
+        stat_fields={"conversions": site.stat_conversions_field, "revenue": site.stat_revenue_field},
+        min_interval=cfg.global_.request_min_interval)
+
+
+def _notifier(cfg: Config, log_path=None) -> Notifier:
+    urls = [os.environ.get(name, "") for name in cfg.global_.webhook_url_envs]
+    return Notifier(webhook_urls=urls, log_path=log_path)
+
+
+def _effective_cap(cfg: Config, store: Store, site: SiteConfig, now: datetime):
+    """What is left of the all-sites daily cap, based on the other sites' latest runs today."""
+    total = cfg.global_.total_daily_cap
+    if total is None:
+        return None
+    day = now.date().isoformat()
+    others = sum(store.latest_today_cost(k, day) for k in cfg.sites if k != site.key)
+    return max(1, total - others)
 
 
 def _select(cfg: Config, key):
@@ -49,8 +66,7 @@ def cmd_probe(args, cfg: Config) -> int:
 
 def cmd_run(args, cfg: Config) -> int:
     store = Store(cfg.global_.db_path)
-    webhook = os.environ.get(cfg.global_.webhook_url_env) if cfg.global_.webhook_url_env else None
-    notifier = Notifier(webhook_url=webhook, log_path=args.log)
+    notifier = _notifier(cfg, args.log)
     dry_run = not args.live
     print(f"[autopilot] mode={'LIVE' if args.live else 'DRY-RUN (변경 없음)'}")
     code = 0
@@ -61,8 +77,10 @@ def cmd_run(args, cfg: Config) -> int:
             print(f"[autopilot] {err}", file=sys.stderr)
             code = 2
             continue
-        result = run_site(site, client, store, notifier, _local_now(cfg), dry_run=dry_run,
-                          kill_switch_file=cfg.global_.kill_switch_file)
+        now = _local_now(cfg)
+        result = run_site(site, client, store, notifier, now, dry_run=dry_run,
+                          kill_switch_file=cfg.global_.kill_switch_file,
+                          daily_cap=_effective_cap(cfg, store, site, now))
         print(f"[{site.key}] aborted={result.aborted} applied={result.applied} planned={result.planned} "
               f"pending={result.pending} failed={result.failed}")
         if result.aborted:
@@ -78,7 +96,14 @@ def cmd_simulate(args, cfg) -> int:
 def cmd_report(args, cfg: Config) -> int:
     store = Store(cfg.global_.db_path)
     digest = build_digest(store, list(cfg.sites), _local_now(cfg))
-    print(format_text(digest))
+    text = format_text(digest)
+    print(text)
+    if args.send:
+        notifier = _notifier(cfg)
+        if not notifier.webhook_urls:
+            print("[autopilot] 웹훅 환경변수가 비어 있어 전송하지 않았습니다.", file=sys.stderr)
+            return 2
+        notifier.send("info", "광고 오토파일럿 일일 요약", text, always_webhook=True)
     if args.out:
         with open(args.out, "w", encoding="utf-8") as fh:
             fh.write(render_html(digest))
@@ -136,6 +161,7 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--units", type=int, default=40)
     sp = add("report", cmd_report, "일일 요약 출력 (+ HTML 저장)")
     sp.add_argument("--out", help="HTML 파일 경로")
+    sp.add_argument("--send", action="store_true", help="Slack/Discord 웹훅으로 전송")
     sp = add("approvals", cmd_approvals, "승인 대기 목록 / 승인 / 거절")
     sp.add_argument("--site")
     sp.add_argument("--approve", type=int)

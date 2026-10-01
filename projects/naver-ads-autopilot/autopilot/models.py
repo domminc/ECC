@@ -36,7 +36,7 @@ class Unit:
 
     id: str
     name: str
-    level: str  # "adgroup" | "keyword"
+    level: str  # "adgroup" | "keyword" | "ad"
     campaign_id: str
     on: bool
     bid: int

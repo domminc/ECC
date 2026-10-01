@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -121,9 +121,13 @@ def _approved_still_valid(units_by_id: dict, action: Action) -> bool:
 
 
 def run_site(site: SiteConfig, client, store: Store, notifier: Notifier, now: datetime, *,
-             dry_run: bool = True, kill_switch_file: Optional[str] = None) -> RunResult:
+             dry_run: bool = True, kill_switch_file: Optional[str] = None,
+             daily_cap: Optional[int] = None) -> RunResult:
+    """daily_cap: tighter spend cap for this run (e.g. what is left of an all-sites budget)."""
     result = RunResult()
     day = now.date().isoformat()
+    if daily_cap is not None and daily_cap < site.daily_budget_cap:
+        site = replace(site, daily_budget_cap=max(1, int(daily_cap)))
 
     def alert(key: str, level: str, message: str) -> None:
         if store.try_alert(site.key, key, day, level, message):

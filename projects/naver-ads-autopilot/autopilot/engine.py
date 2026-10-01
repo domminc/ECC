@@ -249,6 +249,12 @@ def decide(site: SiteConfig, views: list, now: datetime, offs_recent: int = 0) -
 
     # ---- 4. bid adjustment --------------------------------------------------
     site_rpc = eff_revenue(site, site_lb) / site_lb.clicks if site_lb.clicks > 0 else 0.0
+    # Product ads and keywords have few clicks each; they borrow the revenue per click of their own
+    # ad group (when it has enough data) before falling back to the site average.
+    group_totals: dict = {}
+    for v in views:
+        if v.unit.level != "adgroup" and v.unit.adgroup_id:
+            group_totals[v.unit.adgroup_id] = group_totals.get(v.unit.adgroup_id, Stats()) + v.lookback
     cooldown = timedelta(hours=site.cooldown_hours)
     for v in on_managed:
         if v.unit.id in leak_ids:
@@ -256,7 +262,11 @@ def decide(site: SiteConfig, views: list, now: datetime, offs_recent: int = 0) -
         last = v.state.last_change_at
         if last is not None and now - last < cooldown:
             continue
-        new_bid, code, est = propose_bid(site, v.unit.bid, v.recent_stats, site_rpc)
+        prior = site_rpc
+        grp = group_totals.get(v.unit.adgroup_id) if v.unit.level != "adgroup" else None
+        if grp is not None and grp.clicks >= site.min_clicks:
+            prior = eff_revenue(site, grp) / grp.clicks
+        new_bid, code, est = propose_bid(site, v.unit.bid, v.recent_stats, prior)
         if new_bid is None:
             continue
         if defensive and new_bid > v.unit.bid:

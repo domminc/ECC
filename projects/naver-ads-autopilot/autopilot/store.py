@@ -70,6 +70,18 @@ class Store:
         self.conn.execute("UPDATE runs SET summary = ? WHERE id = ?", (json.dumps(summary, ensure_ascii=False), run_id))
         self.conn.commit()
 
+    def latest_today_cost(self, site: str, day: str) -> int:
+        """Spend (VAT-inclusive) the site's most recent run of `day` reported for that day."""
+        row = self.conn.execute(
+            "SELECT summary FROM runs WHERE site = ? AND ts LIKE ? AND summary IS NOT NULL ORDER BY id DESC LIMIT 1",
+            (site, day + "%")).fetchone()
+        if not row:
+            return 0
+        try:
+            return int(json.loads(row["summary"]).get("today_cost") or 0)
+        except (ValueError, TypeError):
+            return 0
+
     def latest_run(self, site: str):
         row = self.conn.execute(
             "SELECT * FROM runs WHERE site = ? ORDER BY id DESC LIMIT 1", (site,)).fetchone()

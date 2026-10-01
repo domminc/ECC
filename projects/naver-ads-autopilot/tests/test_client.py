@@ -112,7 +112,7 @@ class ReadTests(unittest.TestCase):
 
     def test_get_stats_parses_rows_and_fills_missing_ids(self):
         script = Script((200, {"data": [{"id": "g1", "impCnt": 900, "clkCnt": 30, "salesAmt": 9000,
-                                         "ccnt": 2, "convAmt": 60000}]}))
+                                         "purchaseCcnt": 2, "purchaseConvAmt": 60000}]}))
         client, _ = make_client(script)
         out = client.get_stats(["g1", "g2"], date(2026, 3, 1), date(2026, 3, 9))
         self.assertEqual(out["g1"], Stats(900, 30, 9000.0, 2.0, 60000.0))
@@ -120,7 +120,7 @@ class ReadTests(unittest.TestCase):
         query = urllib.parse.parse_qs(urllib.parse.urlsplit(script.requests[0][1]).query)
         self.assertEqual(query["ids"], ["g1", "g2"])
         self.assertEqual(json.loads(query["timeRange"][0]), {"since": "2026-03-01", "until": "2026-03-09"})
-        self.assertEqual(json.loads(query["fields"][0]), ["impCnt", "clkCnt", "salesAmt", "ccnt", "convAmt"])
+        self.assertEqual(json.loads(query["fields"][0]), ["impCnt", "clkCnt", "salesAmt", "purchaseCcnt", "purchaseConvAmt"])
 
     def test_get_stats_chunks_large_id_lists(self):
         ids = [f"g{i}" for i in range(120)]
