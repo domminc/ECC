@@ -1,0 +1,9 @@
+# secrets and local state: never commit
+config.toml
+*.db
+KILL
+*.log
+report.html
+
+__pycache__/
+*.pyc

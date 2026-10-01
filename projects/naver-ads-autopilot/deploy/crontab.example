@@ -1,0 +1,10 @@
+# crontab -e 로 붙여 넣으세요. 경로(/opt/ECC/...)는 실제 위치로 바꿉니다.
+CRON_TZ=Asia/Seoul
+
+# 매시 5분: 판단 + 실행.
+#  - 처음 2주(섀도 모드)는 --live 를 빼고 dry-run 으로 돌려 "하려던 일"만 기록합니다.
+#  - 검증이 끝나면 --live 를 붙입니다.
+5 * * * *  /opt/ECC/projects/naver-ads-autopilot/deploy/run.sh run --log /var/log/naver-ads-autopilot.log >> /var/log/naver-ads-autopilot.cron.log 2>&1
+
+# 매일 10:00: 일일 요약을 Slack/Discord 로 전송 (10:10 확인 루틴 직전)
+0 10 * * *  /opt/ECC/projects/naver-ads-autopilot/deploy/run.sh report --send --out /opt/ECC/projects/naver-ads-autopilot/report.html >> /var/log/naver-ads-autopilot.cron.log 2>&1
