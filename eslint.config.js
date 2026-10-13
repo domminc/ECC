@@ -32,6 +32,15 @@ module.exports = [
         }
     },
     {
+        files: ['apps/policy-fund/app.js', 'apps/policy-fund/data/funds.js'],
+        languageOptions: {
+            sourceType: 'script',
+            globals: {
+                ...globals.browser
+            }
+        }
+    },
+    {
         files: ['docker/context-profiles/complex-eval/**/recurring-incident/**/*.js'],
         languageOptions: {
             sourceType: 'module'

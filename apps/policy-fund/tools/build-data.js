@@ -50,7 +50,7 @@ const META = {
 };
 
 function parseCsv(text) {
-  const src = text.replace(/^﻿/, '');
+  const src = text.replace(/^\uFEFF/, '');
   const rows = [];
   let row = [];
   let field = '';
