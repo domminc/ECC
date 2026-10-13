@@ -8,9 +8,13 @@
 - 생성물: `data/funds.json`(정본), `data/funds.js`(file:// 로 열 때 쓰는 래퍼)
 - 갱신: CSV를 교체한 뒤 `node apps/policy-fund/tools/build-data.js`
 
+## 글꼴
+
+글꼴은 항상 Pretendard입니다. `fonts/pretendard-subset.woff2`는 Pretendard Variable 1.3.9(SIL OFL 1.1, `fonts/LICENSE-Pretendard.txt`)에서 굵기 400~700, 기본 라틴, KS X 1001 한글 2,350자와 화면에 쓰이는 글자만 남긴 서브셋입니다. 목록에 없는 글자는 시스템 한글 글꼴로 대체됩니다. 새 글자가 필요하면 npm `pretendard` 패키지의 `PretendardVariable.woff2`를 fontTools(`varLib.instancer`로 굵기 제한, `subset`으로 글자 제한)로 다시 만드세요.
+
 ## 한 장짜리 HTML로 게시하기
 
-`node apps/policy-fund/tools/build-artifact.js <출력파일.html>`로 CSS, 데이터, JS를 안에 넣은 단일 HTML을 만듭니다. 이 파일을 Claude Artifact로 같은 URL에 다시 올리면(Artifact 도구에 같은 파일 경로 또는 `url` 지정) 데이터가 갱신될 때마다 같은 주소에서 새 버전을 볼 수 있습니다.
+`node apps/policy-fund/tools/build-artifact.js <출력파일.html>`로 CSS, 글꼴, 데이터, JS를 안에 넣은 단일 HTML을 만듭니다. 이 파일을 Claude Artifact로 같은 URL에 다시 올리면(Artifact 도구에 같은 파일 경로 또는 `url` 지정) 데이터가 갱신될 때마다 같은 주소에서 새 버전을 볼 수 있습니다.
 
 ## 알려진 한계
 

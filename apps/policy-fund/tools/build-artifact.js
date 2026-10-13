@@ -16,6 +16,14 @@ const read = file => fs.readFileSync(path.join(APP_DIR, file), 'utf8');
 // Keep inlined text from closing its own <script> or <style> element.
 const safe = text => text.replace(/<\/(script|style)/gi, '<\\/$1');
 
+// The Artifact host only allows Google Fonts remotely, so the font file is embedded as a data URI.
+function inlineFonts(css) {
+  return css.replace(/url\("(fonts\/[^"]+\.woff2)"\)/g, (_match, file) => {
+    const base64 = fs.readFileSync(path.join(APP_DIR, file)).toString('base64');
+    return `url("data:font/woff2;base64,${base64}")`;
+  });
+}
+
 function buildArtifactHtml() {
   const html = read('index.html');
   const title = html.match(/<title>([^<]+)<\/title>/)[1];
@@ -28,7 +36,7 @@ function buildArtifactHtml() {
   return [
     `<title>${title}</title>`,
     remoteLinks,
-    `<style>\n${safe(read('styles.css'))}</style>`,
+    `<style>\n${safe(inlineFonts(read('styles.css')))}</style>`,
     bodyMarkup.trim(),
     `<script>\n${safe(read('data/funds.js'))}</script>`,
     `<script>\n${safe(read('app.js'))}</script>`,

@@ -107,9 +107,10 @@ function runTests() {
     assert.ok(/^<title>[^<]+<\/title>/.test(html), 'starts with title');
     assert.ok(!/<(!doctype|html|head|body)[\s>]/i.test(html), 'no document wrapper');
     assert.ok(!/<script src=|href="(?!https:\/\/fonts\.(googleapis|gstatic)\.com)[^"]*\.css"/i.test(html), 'no external files');
-    const links = html.match(/<link\b[^>]*>/g) || [];
-    assert.ok(links.every(l => /href="https:\/\/fonts\.(googleapis|gstatic)\.com/.test(l)), 'only font links');
+    assert.ok(!/<link\b/i.test(html), 'no link tags');
     assert.strictEqual((html.match(/window\.POLICY_FUND_DATA =/g) || []).length, 1);
+    assert.ok(/@font-face\s*{[^}]*url\("data:font\/woff2;base64,/.test(html), 'font embedded as data URI');
+    assert.ok(/--font-body:\s*"Pretendard"/.test(html), 'Pretendard leads the font stack');
     assert.ok(html.includes(built.funds[0].name));
     assert.ok(html.includes('id="fund-list"'));
   }));
