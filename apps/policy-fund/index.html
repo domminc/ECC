@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>정책자금 한눈에 보기</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="page-header">
+    <h1 id="page-title">정책자금 한눈에 보기</h1>
+    <p id="as-of" class="muted"></p>
+    <details class="notice" open>
+      <summary>꼭 확인하세요</summary>
+      <ul id="caveats"></ul>
+    </details>
+  </header>
+
+  <main class="layout">
+    <section class="list-pane" aria-label="정책자금 목록">
+      <form id="filters" class="filters" role="search" onsubmit="return false">
+        <label class="field field-search">
+          <span>검색</span>
+          <input id="q" type="search" placeholder="자금명, 조건 키워드">
+        </label>
+        <fieldset class="field">
+          <legend>기관</legend>
+          <div id="agency-chips" class="chips"></div>
+        </fieldset>
+        <fieldset class="field">
+          <legend>대상</legend>
+          <div id="target-chips" class="chips"></div>
+        </fieldset>
+        <label class="field">
+          <span>자금군</span>
+          <select id="group"></select>
+        </label>
+      </form>
+      <p id="count" class="muted" aria-live="polite"></p>
+      <ul id="fund-list" class="fund-list"></ul>
+      <p id="empty" class="empty" hidden>조건에 맞는 정책자금이 없습니다. 필터를 줄여 보세요.</p>
+    </section>
+
+    <aside id="detail" class="detail-pane" aria-label="정책자금 상세" tabindex="-1">
+      <p class="placeholder">목록에서 자금을 선택하면 조건, 필요 서류, 원문 링크를 볼 수 있습니다.</p>
+    </aside>
+  </main>
+
+  <footer class="page-footer muted" id="apply-links"></footer>
+
+  <script src="data/funds.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
