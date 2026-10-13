@@ -261,7 +261,8 @@
     updateProgress();
 
     body.append(h('div', { class: 'dl' },
-      h('button', { type: 'button', class: 'btn', onclick: () => downloadText(`${f.id}-checklist.csv`, csvFor(f)), text: '체크리스트 CSV 내려받기' }),
+      h('button', { type: 'button', class: 'btn', onclick: () => startDraftFor(f.id), text: '이 자금으로 사업계획서 초안 작성' }),
+      h('button', { type: 'button', class: 'btn alt', onclick: () => downloadText(`${f.id}-checklist.csv`, csvFor(f)), text: '체크리스트 CSV 내려받기' }),
       ext(D.SOURCES[f.src].url, '공식 공고 원문 ↗'),
     ));
     body.append(h('p', { class: 'src', text: '출처: ' + D.SOURCES[f.src].label }));
@@ -329,6 +330,231 @@
     document.getElementById('asOf').textContent = D.AS_OF;
   }
 
+
+  /* ---------- 사업계획서 초안 ---------- */
+  const DR = window.PF_DRAFT;
+  const dform = document.getElementById('draftForm');
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  const agencyOfFund = (id) => (fundById[id] ? fundById[id].agency : 'semas');
+  function defaultFundId() {
+    const first = E.evaluateAll(D.FUNDS, profile).find((r) => r.status === 'fit');
+    return first ? first.fund.id : 'semas-general';
+  }
+  const savedDraft = store.get('pf.draft', null);
+  const draft = (savedDraft && fundById[savedDraft.fundId] && savedDraft.input)
+    ? savedDraft
+    : { fundId: defaultFundId(), isExample: true, input: null };
+  if (!draft.input) draft.input = clone(DR.EXAMPLES[agencyOfFund(draft.fundId)]);
+
+  function emptyInput() {
+    return {
+      company: '', ceo: '', openDate: '', industryName: '', address: '', mainBiz: '',
+      sales: [0, 1, 2].map(() => ({ year: '', amount: '', profit: '', debt: '' })),
+      products: '', customers: '', strengths: '', changes: '', careers: '', tech: '', market: '', hiring: '',
+      applyAmount: '', plan: [{ kind: '운전', use: '', party: '', amount: '', when: '' }], repay: '',
+    };
+  }
+
+  function buildFundSelect() {
+    const sel = clear(document.getElementById('dFund'));
+    ['semas', 'kosmes'].forEach((ag) => {
+      const group = h('optgroup', { label: `${D.AGENCIES[ag].short} (${D.AGENCIES[ag].audience})` });
+      D.FUNDS.filter((f) => f.agency === ag).forEach((f) => group.append(h('option', { value: f.id, text: f.name })));
+      sel.append(group);
+    });
+  }
+
+  function inp(attrs) { return h('input', Object.assign({ type: 'text' }, attrs)); }
+
+  function renderRows() {
+    const wide = agencyOfFund(draft.fundId) === 'kosmes';
+    const sales = clear(document.getElementById('salesRows'));
+    draft.input.sales.forEach((r, i) => {
+      const row = h('div', { class: 'row-sales' + (wide ? ' wide' : '') },
+        inp({ 'data-s': 'year', 'data-i': i, value: r.year, placeholder: '연도', 'aria-label': `${i + 1}번째 연도` }),
+        inp({ 'data-s': 'amount', 'data-i': i, value: r.amount, placeholder: '매출액(원)', inputmode: 'numeric', 'aria-label': `${i + 1}번째 매출액` }));
+      if (wide) {
+        row.append(inp({ 'data-s': 'profit', 'data-i': i, value: r.profit, placeholder: '영업이익(원)', inputmode: 'numeric', 'aria-label': `${i + 1}번째 영업이익` }),
+          inp({ 'data-s': 'debt', 'data-i': i, value: r.debt, placeholder: '부채비율%', inputmode: 'numeric', 'aria-label': `${i + 1}번째 부채비율` }));
+      }
+      sales.append(row);
+    });
+    const plan = clear(document.getElementById('planRows'));
+    draft.input.plan.forEach((r, i) => {
+      const kind = h('select', { 'data-p': 'kind', 'data-i': i, 'aria-label': `${i + 1}번째 구분` },
+        h('option', { value: '운전', text: '운전' }), h('option', { value: '시설', text: '시설' }));
+      kind.value = r.kind === '시설' ? '시설' : '운전';
+      plan.append(h('div', { class: 'row-plan' },
+        kind,
+        inp({ 'data-p': 'use', 'data-i': i, value: r.use, placeholder: '세부 용도', 'aria-label': `${i + 1}번째 용도` }),
+        inp({ 'data-p': 'amount', 'data-i': i, value: r.amount, placeholder: '금액(원)', inputmode: 'numeric', 'aria-label': `${i + 1}번째 금액` }),
+        h('div', { class: 'full' },
+          inp({ 'data-p': 'party', 'data-i': i, value: r.party, placeholder: '거래처·내용', 'aria-label': `${i + 1}번째 거래처` }),
+          inp({ 'data-p': 'when', 'data-i': i, value: r.when, placeholder: '집행 시기', 'aria-label': `${i + 1}번째 집행 시기` }),
+          h('button', { type: 'button', 'data-del': i, 'aria-label': `${i + 1}번째 행 삭제`, text: '삭제' }))));
+    });
+  }
+
+  function writeDraft() {
+    dform.querySelectorAll('[data-k]').forEach((el) => {
+      const k = el.dataset.k;
+      el.value = k === 'fundId' ? draft.fundId : (draft.input[k] === undefined || draft.input[k] === null ? '' : draft.input[k]);
+    });
+    renderRows();
+    toggleAgencyFields();
+    document.getElementById('draftExample').hidden = !draft.isExample;
+    document.getElementById('draftLoad').hidden = draft.isExample;
+  }
+
+  function toggleAgencyFields() {
+    const ag = agencyOfFund(draft.fundId);
+    dform.querySelectorAll('[data-agency]').forEach((el) => { el.hidden = el.dataset.agency !== ag; });
+  }
+
+  function readDraft() {
+    dform.querySelectorAll('[data-k]').forEach((el) => {
+      if (el.dataset.k === 'fundId') draft.fundId = el.value;
+      else draft.input[el.dataset.k] = el.value;
+    });
+    dform.querySelectorAll('[data-s]').forEach((el) => { draft.input.sales[Number(el.dataset.i)][el.dataset.s] = el.value; });
+    dform.querySelectorAll('[data-p]').forEach((el) => { draft.input.plan[Number(el.dataset.i)][el.dataset.p] = el.value; });
+  }
+
+  function copyText(text, btn) {
+    const original = btn.textContent;
+    const done = () => { btn.textContent = '복사됨'; setTimeout(() => { btn.textContent = original; }, 1500); };
+    const fallback = () => {
+      const ta = h('textarea', { style: 'position:fixed;opacity:0;top:0' });
+      ta.value = text;
+      document.body.append(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); } catch (_e) { btn.textContent = '직접 선택해 복사하세요'; }
+      ta.remove();
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);
+    else fallback();
+  }
+
+  const isMissing = (t) => String(t).includes('【작성 필요');
+  function textCell(tag, text) {
+    return h(tag, {}, isMissing(text) ? h('span', { class: 'missing', text }) : text);
+  }
+
+  function renderBlock(b) {
+    if (b.type === 'h') return h('p', { class: 'h', text: b.text });
+    if (b.type === 'p') {
+      return h('p', { class: b.auto ? 'auto' : '' }, isMissing(b.text) ? h('span', { class: 'missing', text: b.text }) : b.text);
+    }
+    if (b.type === 'kv') {
+      return h('div', { class: 'tw' }, h('table', { class: 'kv' }, h('tbody', {}, b.rows.map((r) => h('tr', {}, h('th', { scope: 'row', text: r[0] }), textCell('td', r[1]))))));
+    }
+    return h('div', { class: 'tw' }, h('table', {}, h('thead', {}, h('tr', {}, b.header.map((x) => h('th', { text: x })))),
+      h('tbody', {}, b.rows.map((r) => h('tr', {}, r.map((c) => textCell('td', c)))))));
+  }
+
+  let lastDoc = null;
+  function renderDraftPreview() {
+    const fund = fundById[draft.fundId];
+    const need = { working: '운전자금', facility: '시설자금', both: '시설·운전자금' }[profile.need];
+    const note = clear(document.getElementById('dProfileNote'));
+    note.append(`내 정보에서 가져옴: ${DR.INDUSTRY_LABEL[profile.industry]} · 상시근로자 ${profile.employees}명 · 업력 ${profile.years}년 · ${need}${profile.salesDrop !== 'none' ? ' · 매출 감소' : ''} `,
+      h('button', { type: 'button', class: 'ghost small', onclick: () => showTab('finder'), text: '수정' }));
+
+    lastDoc = DR.build(draft.input, fund, profile);
+    const issues = clear(document.getElementById('draftIssues'));
+    lastDoc.issues.forEach((i) => issues.append(h('li', { text: i.msg })));
+    if (!lastDoc.issues.length && lastDoc.missing === 0) issues.append(h('li', { class: 'ok', text: '점검 항목이 없습니다. 제출 전에 공고의 최신 요건과 함께 한 번 더 확인하세요.' }));
+    document.getElementById('draftMissing').textContent = lastDoc.missing ? `작성 필요 ${lastDoc.missing}곳` : '모든 항목 입력됨';
+
+    const sumEl = document.getElementById('dPlanSum');
+    const t = DR.planTotals(draft.input.plan);
+    const apply = DR.num(draft.input.applyAmount);
+    sumEl.textContent = `집행계획 합계 ${DR.won(t.total) || '0원'}`
+      + (Number.isFinite(apply) ? (t.total === apply ? ' · 신청금액과 일치' : ` · 신청금액과 ${DR.won(Math.abs(apply - t.total))} 차이`) : ' · 신청 금액을 입력하세요');
+
+    const box = clear(document.getElementById('draftPreview'));
+    lastDoc.sections.forEach((sec) => {
+      const copy = h('button', { type: 'button', class: 'ghost small', text: '복사' });
+      copy.addEventListener('click', () => copyText(DR.sectionText(sec), copy));
+      box.append(h('section', { class: 'draft-sec' },
+        h('div', { class: 'draft-sec-head' }, h('h3', { text: sec.title }), copy),
+        sec.blocks.map(renderBlock)));
+    });
+  }
+
+  function persistDraft() { store.set('pf.draft', draft); }
+
+  function setFund(id) {
+    const before = agencyOfFund(draft.fundId);
+    draft.fundId = id;
+    if (draft.isExample && agencyOfFund(id) !== before) draft.input = clone(DR.EXAMPLES[agencyOfFund(id)]);
+    persistDraft();
+    writeDraft();
+    renderDraftPreview();
+  }
+
+  function startDraftFor(id) {
+    if (dialog.open) dialog.close();
+    setFund(id);
+    showTab('draft');
+  }
+
+  buildFundSelect();
+  dform.addEventListener('input', (e) => {
+    if (e.target.dataset.k === 'fundId') { setFund(e.target.value); return; }
+    readDraft();
+    draft.isExample = false;
+    document.getElementById('draftExample').hidden = true;
+    document.getElementById('draftLoad').hidden = false;
+    persistDraft();
+    renderDraftPreview();
+  });
+  dform.addEventListener('submit', (e) => e.preventDefault());
+  dform.addEventListener('click', (e) => {
+    const del = e.target.closest('[data-del]');
+    if (del) {
+      readDraft();
+      draft.input.plan.splice(Number(del.dataset.del), 1);
+      if (!draft.input.plan.length) draft.input.plan.push({ kind: '운전', use: '', party: '', amount: '', when: '' });
+      draft.isExample = false;
+      persistDraft();
+      writeDraft();
+      renderDraftPreview();
+    }
+  });
+  document.getElementById('planAdd').addEventListener('click', () => {
+    readDraft();
+    draft.input.plan.push({ kind: '운전', use: '', party: '', amount: '', when: '' });
+    draft.isExample = false;
+    persistDraft();
+    renderRows();
+    renderDraftPreview();
+  });
+  document.getElementById('draftClear').addEventListener('click', () => {
+    draft.input = emptyInput();
+    draft.isExample = false;
+    persistDraft();
+    writeDraft();
+    renderDraftPreview();
+  });
+  document.getElementById('draftLoad').addEventListener('click', () => {
+    draft.input = clone(DR.EXAMPLES[agencyOfFund(draft.fundId)]);
+    draft.isExample = true;
+    persistDraft();
+    writeDraft();
+    renderDraftPreview();
+  });
+  document.getElementById('draftCopyAll').addEventListener('click', (e) => copyText(DR.toText(lastDoc), e.currentTarget));
+  document.getElementById('draftDownload').addEventListener('click', () => {
+    const name = `사업계획서_초안_${(draft.input.company || '미입력').replace(/[\\/:*?"<>|\s]+/g, '_')}.doc`;
+    const url = URL.createObjectURL(new Blob([DR.toWordHtml(lastDoc)], { type: 'application/msword' }));
+    const a = h('a', { href: url, download: name });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+
   /* ---------- 탭 ---------- */
   function showTab(name) {
     document.querySelectorAll('[role="tab"]').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
@@ -344,6 +570,7 @@
     document.getElementById('exampleNote').hidden = true;
     store.set('pf.profile', profile);
     renderResults();
+    renderDraftPreview();
   });
   form.addEventListener('submit', (e) => e.preventDefault());
   document.getElementById('resetProfile').addEventListener('click', () => {
@@ -353,6 +580,7 @@
     store.set('pf.profile', null);
     writeForm();
     renderResults();
+    renderDraftPreview();
   });
   [['fAgency', 'agency'], ['fMethod', 'method'], ['fUse', 'use'], ['fText', 'text']].forEach(([id, key]) => {
     document.getElementById(id).addEventListener('input', (e) => { filters[key] = e.target.value; renderList(); });
@@ -363,6 +591,8 @@
   writeForm();
   document.getElementById('exampleNote').hidden = !usedExample;
   renderResults();
+  writeDraft();
+  renderDraftPreview();
   renderList();
   renderDocsTab();
   renderSchedule();

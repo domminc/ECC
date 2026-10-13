@@ -11,6 +11,7 @@ const path = require('path');
 const root = path.resolve(__dirname, '..', '..', 'examples', 'policy-fund-finder');
 const D = require(path.join(root, 'data', 'funds.js'));
 const E = require(path.join(root, 'data', 'eligibility.js'));
+const R = require(path.join(root, 'data', 'draft.js'));
 
 function test(name, fn) {
   try {
@@ -134,6 +135,80 @@ run('evaluateAll orders fit before check before no', () => {
   const out = E.evaluateAll(D.FUNDS, base);
   const order = { fit: 0, check: 1, no: 2 };
   for (let i = 1; i < out.length; i++) assert.ok(order[out[i - 1].status] <= order[out[i].status]);
+});
+
+
+const fund = (id) => D.FUNDS.find(f => f.id === id);
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const profileOf = (o) => Object.assign({ industry: 'food_lodging', employees: 2, years: 4, need: 'working', salesDrop: 'none' }, o);
+
+run('draft: average sales and year-over-year growth are computed from input', () => {
+  const st = R.salesStats(R.EXAMPLES.semas.sales);
+  assert.strictEqual(st.avg, 180000000);
+  assert.strictEqual(Math.round(st.rows[1].growth * 10) / 10, 10.3);
+  assert.ok(Number.isNaN(st.rows[0].growth));
+});
+
+run('draft: complete example has no missing items and no issues', () => {
+  const doc = R.build(R.EXAMPLES.semas, fund('semas-general'), profileOf());
+  assert.strictEqual(doc.missing, 0);
+  assert.deepStrictEqual(doc.issues, []);
+  const text = R.toText(doc);
+  assert.ok(text.includes('180,000,000원'));
+  assert.ok(text.includes('합계가 신청금액(50,000,000원)과 일치합니다'));
+});
+
+run('draft: empty input leaves placeholders instead of inventing content', () => {
+  const doc = R.build({ sales: [], plan: [] }, fund('semas-general'), profileOf());
+  assert.ok(doc.missing >= 8);
+  assert.ok(R.toText(doc).includes('【작성 필요'));
+  assert.ok(!/\d{2,3},\d{3},\d{3}원/.test(R.toText(doc)), 'no invented amounts');
+});
+
+run('draft: plan total mismatch and over-limit amounts are flagged', () => {
+  const input = clone(R.EXAMPLES.semas);
+  input.applyAmount = '40000000';
+  let issues = R.check(input, fund('semas-general'));
+  assert.ok(issues.some(i => i.msg.includes('신청금액')));
+  input.applyAmount = '100000000';
+  input.plan = [{ kind: '운전', use: '식자재', party: '', amount: '100000000', when: '' }];
+  issues = R.check(input, fund('semas-general'));
+  assert.ok(issues.some(i => i.msg.includes('한도')));
+});
+
+run('draft: facility rows on a working-capital-only fund are flagged', () => {
+  const input = clone(R.EXAMPLES.semas);
+  input.plan = [{ kind: '시설', use: '오븐', party: '', amount: '50000000', when: '' }];
+  assert.ok(R.check(input, fund('semas-general')).some(i => i.msg.includes('운전자금 전용')));
+});
+
+run('draft: SME template for KOSMES funds includes financial table and auto sales note', () => {
+  const doc = R.build(R.EXAMPLES.kosmes, fund('kosmes-innov-growth'), profileOf({ industry: 'mfg', employees: 18, years: 10 }));
+  assert.strictEqual(doc.title, '사업계획서 (중소기업용)');
+  assert.strictEqual(doc.missing, 0);
+  const text = R.toText(doc);
+  assert.ok(text.includes('재무 현황'));
+  assert.ok(text.includes('2023') && text.includes('2025'));
+});
+
+run('draft: sales-drop answer from the profile adds an auto note', () => {
+  const doc = R.build(R.EXAMPLES.semas, fund('semas-temp'), profileOf({ salesDrop: '15' }));
+  assert.ok(R.toText(doc).includes('15% 이상 감소'));
+});
+
+run('draft: Word HTML escapes user input', () => {
+  const input = clone(R.EXAMPLES.semas);
+  input.company = '<script>alert(1)</script>';
+  const html = R.toWordHtml(R.build(input, fund('semas-general'), profileOf()));
+  assert.ok(!html.includes('<script>'));
+  assert.ok(html.includes('&lt;script&gt;'));
+});
+
+run('draft: every fund with limitWon has sane numeric values', () => {
+  for (const f of D.FUNDS) {
+    if (!f.limitWon) continue;
+    for (const v of Object.values(f.limitWon)) assert.ok(Number.isInteger(v) && v > 0, f.id);
+  }
 });
 
 console.log(`\nPassed: ${passed}`);

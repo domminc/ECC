@@ -29,6 +29,7 @@
     <div class="wrap tabs-inner" role="tablist">
       <button role="tab" id="tab-finder" aria-controls="panel-finder" aria-selected="true" data-tab="finder">내게 맞는 자금</button>
       <button role="tab" id="tab-list" aria-controls="panel-list" aria-selected="false" data-tab="list">전체 자금 비교</button>
+      <button role="tab" id="tab-draft" aria-controls="panel-draft" aria-selected="false" data-tab="draft">사업계획서 초안</button>
       <button role="tab" id="tab-docs" aria-controls="panel-docs" aria-selected="false" data-tab="docs">서류 · 양식</button>
       <button role="tab" id="tab-schedule" aria-controls="panel-schedule" aria-selected="false" data-tab="schedule">접수 일정 · 문의</button>
     </div>
@@ -150,6 +151,96 @@
       </div>
     </section>
 
+    <section id="panel-draft" role="tabpanel" aria-labelledby="tab-draft" hidden>
+      <div class="finder draft">
+        <form id="draftForm" class="profile" autocomplete="off">
+          <p class="example-note" id="draftExample">
+            <span>가상의 예시 데이터로 채워 두었습니다. 내 정보로 바꾸면 오른쪽 초안이 바로 바뀝니다.</span>
+            <button type="button" class="ghost small" id="draftClear">모두 비우기</button>
+          </p>
+          <button type="button" class="ghost small" id="draftLoad" hidden>예시 불러오기</button>
+
+          <fieldset>
+            <legend>어떤 자금용 초안인가요</legend>
+            <label class="field" for="dFund">대상 자금
+              <select id="dFund" data-k="fundId"></select>
+            </label>
+            <p class="derived" id="dProfileNote"></p>
+          </fieldset>
+
+          <fieldset>
+            <legend>업체 정보</legend>
+            <div class="two">
+              <label class="field" for="dCompany">상호<input id="dCompany" data-k="company" type="text"></label>
+              <label class="field" for="dCeo">대표자<input id="dCeo" data-k="ceo" type="text"></label>
+            </div>
+            <div class="two">
+              <label class="field" for="dOpen">개업(설립)일자<input id="dOpen" data-k="openDate" type="date"></label>
+              <label class="field" for="dIndustryName">업종명<input id="dIndustryName" data-k="industryName" type="text" placeholder="예: 음식점업 (분식)"></label>
+            </div>
+            <label class="field" for="dAddress">사업장 주소<input id="dAddress" data-k="address" type="text"></label>
+            <label class="field" for="dMainBiz">주요 사업내용 (한 줄)<input id="dMainBiz" data-k="mainBiz" type="text"></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>연도별 실적 (원)</legend>
+            <p class="hint">최근 3개년 매출을 입력하면 평균과 전년 대비 증감을 자동 계산합니다.</p>
+            <div id="salesRows" class="rows"></div>
+          </fieldset>
+
+          <fieldset data-agency="semas">
+            <legend>영업현황</legend>
+            <label class="field" for="dProducts">상품·서비스 (한 줄에 하나: 상품 | 판매 방식 | 매출 비중 | 가격)
+              <textarea id="dProducts" data-k="products" rows="3"></textarea></label>
+            <label class="field" for="dCustomers">주요 고객과 거래처<textarea id="dCustomers" data-k="customers" rows="2"></textarea></label>
+            <label class="field" for="dStrengths">경쟁 환경과 강점<textarea id="dStrengths" data-k="strengths" rows="2"></textarea></label>
+            <label class="field" for="dChanges">최근 매출 변동과 원인<textarea id="dChanges" data-k="changes" rows="2"></textarea></label>
+          </fieldset>
+
+          <fieldset data-agency="kosmes">
+            <legend>사업 · 기술 · 고용</legend>
+            <label class="field" for="dTech">제품·보유 기술 (특허·인증·R&amp;D)<textarea id="dTech" data-k="tech" rows="3"></textarea></label>
+            <label class="field" for="dMarket">시장·고객·수주 현황<textarea id="dMarket" data-k="market" rows="3"></textarea></label>
+            <label class="field" for="dHiring">고용·수출 계획<textarea id="dHiring" data-k="hiring" rows="2"></textarea></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>대표자 경력</legend>
+            <label class="field" for="dCareers">한 줄에 하나: 기간 | 근무처 | 담당 업무
+              <textarea id="dCareers" data-k="careers" rows="3"></textarea></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>자금집행계획</legend>
+            <label class="field" for="dApply">신청 금액 (원)
+              <input id="dApply" data-k="applyAmount" type="number" min="0" step="1000000" inputmode="numeric"></label>
+            <div id="planRows" class="rows"></div>
+            <button type="button" class="ghost small" id="planAdd">행 추가</button>
+            <p class="derived" id="dPlanSum" aria-live="polite"></p>
+          </fieldset>
+
+          <fieldset>
+            <legend>상환 계획</legend>
+            <label class="field" for="dRepay">상환 재원과 월 상환 가능 금액<textarea id="dRepay" data-k="repay" rows="3"></textarea></label>
+          </fieldset>
+        </form>
+
+        <div class="results" aria-live="polite">
+          <div class="results-head">
+            <h2>초안 미리보기</h2>
+            <p id="draftMissing" class="count"></p>
+          </div>
+          <ul id="draftIssues" class="issues"></ul>
+          <div class="dl draft-actions">
+            <button type="button" class="btn" id="draftDownload">Word 문서(.doc)로 내려받기</button>
+            <button type="button" class="btn alt" id="draftCopyAll">전체 텍스트 복사</button>
+          </div>
+          <p class="src">직접 입력한 사실만 반영하고, 비어 있는 항목은 【작성 필요】로 남깁니다. 소진공은 각 절의 [복사]를 눌러 사업계획서 웹폼(영업현황·경력·자금집행계획)에 붙여 넣으세요.</p>
+          <div id="draftPreview" class="preview"></div>
+        </div>
+      </div>
+    </section>
+
     <section id="panel-docs" role="tabpanel" aria-labelledby="tab-docs" hidden>
       <h2>작성 양식 · 작성예시</h2>
       <p class="sub">빈 양식과 가상 데이터로 채운 작성예시를 함께 내려받을 수 있습니다. 공식 서식이 아닌 준비용 양식입니다.</p>
@@ -198,6 +289,7 @@
 
   <script src="data/funds.js"></script>
   <script src="data/eligibility.js"></script>
+  <script src="data/draft.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
