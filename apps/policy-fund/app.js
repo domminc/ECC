@@ -141,6 +141,10 @@
     el('as-of').textContent = '기준일 ' + data.meta.asOf + ' · ' + data.meta.basis;
     data.meta.caveats.forEach(function (c) { el('caveats').appendChild(node('li', { text: c })); });
 
+    data.meta.changeNotices.forEach(function (n) {
+      el('change-notices').appendChild(node('li', {}, [safeLink(n.url, n.label) || document.createTextNode(n.label)]));
+    });
+
     var foot = el('apply-links');
     foot.appendChild(document.createTextNode('신청: '));
     data.meta.applyUrls.forEach(function (a, i) {

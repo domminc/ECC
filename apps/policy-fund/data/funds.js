@@ -9,6 +9,16 @@ window.POLICY_FUND_DATA = {
       "필요 서류와 공식 양식은 공고문에 목록이 없어 비어 있습니다. 각 기관 안내를 확인하세요.",
       "금리는 분기별로 변동하는 정책자금 기준금리에 가산금리를 더하는 구조입니다. 실제 %는 기관 공지를 확인하세요."
     ],
+    "changeNotices": [
+      {
+        "label": "중진공 변경공고 제2026-464호 (2026.07.28) 원문",
+        "url": "https://www.bizinfo.go.kr/sii/siia/selectSIIA200Detail.do?pblancId=PBLN_000000000124795"
+      },
+      {
+        "label": "소진공 5차 변경 공고 (2026.10.2 등록): 원문 링크 확인 중",
+        "url": ""
+      }
+    ],
     "applyUrls": [
       {
         "label": "소상공인정책자금 신청(소진공)",

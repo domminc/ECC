@@ -50,6 +50,13 @@ function runTests() {
     }
   }));
 
+  results.push(test('meta links are https or empty with a label', () => {
+    for (const link of [...built.meta.changeNotices, ...built.meta.applyUrls]) {
+      assert.ok(link.label, 'link needs a label');
+      assert.ok(link.url === '' || /^https:\/\//.test(link.url), link.label);
+    }
+  }));
+
   results.push(test('KOSMES funds exclude small businesses unless the notice allows them', () => {
     const kosmes = built.funds.filter(f => f.agency === '중진공');
     assert.ok(kosmes.length > 0);
