@@ -6,6 +6,8 @@ on:
     tags: ['v*']
   pull_request:
     branches: [main]
+  # Manual full-matrix run (e.g. to verify a branch on every OS before merge)
+  workflow_dispatch:
 
 # Prevent duplicate runs
 concurrency:
@@ -21,6 +23,16 @@ jobs:
     name: Test (${{ matrix.os }}, Node ${{ matrix.node }}, ${{ matrix.pm }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
+    # Actions minutes are billed per OS (Linux x1, Windows x2, macOS x10).
+    # Pull requests run every Linux cell plus a representative Windows/macOS
+    # subset; push (main, release/**, v* tags) and manual runs keep the full
+    # matrix. Skipped cells report as skipped (not pending), so required
+    # check names are unchanged.
+    if: >-
+      github.event_name != 'pull_request' ||
+      matrix.os == 'ubuntu-latest' ||
+      (matrix.os == 'windows-latest' && (matrix.pm == 'npm' || matrix.node == '20.x')) ||
+      (matrix.os == 'macos-latest' && matrix.node == '20.x' && matrix.pm == 'npm')
 
     strategy:
       fail-fast: false
