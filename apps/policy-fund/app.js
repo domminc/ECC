@@ -26,7 +26,7 @@
 
   function extLink(url, label, cls) {
     if (!/^https:\/\//.test(url)) return null;
-    return h('a', { href: url, target: '_blank', rel: 'noopener noreferrer', class: cls }, label, h('span', { class: 'ext', 'aria-hidden': 'true', text: '↗' }));
+    return h('a', { href: url, target: '_blank', rel: 'noopener noreferrer', class: cls }, label, h('span', { class: 'ext', 'aria-hidden': 'true', text: '\u2197' }));
   }
 
   const uniq = list => list.filter((v, i) => list.indexOf(v) === i);

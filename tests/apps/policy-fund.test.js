@@ -30,7 +30,7 @@ function runTests() {
   const results = [];
 
   results.push(test('parseCsv handles quoted commas and BOM', () => {
-    const rows = parseCsv('﻿a,b\n"x,y","he said ""hi"""\n');
+    const rows = parseCsv('\uFEFFa,b\n"x,y","he said ""hi"""\n');
     assert.deepStrictEqual(rows, [['a', 'b'], ['x,y', 'he said "hi"']]);
   }));
 
