@@ -8,6 +8,10 @@
 - 생성물: `data/funds.json`(정본), `data/funds.js`(file:// 로 열 때 쓰는 래퍼)
 - 갱신: CSV를 교체한 뒤 `node apps/policy-fund/tools/build-data.js`
 
+## 한 장짜리 HTML로 게시하기
+
+`node apps/policy-fund/tools/build-artifact.js <출력파일.html>`로 CSS, 데이터, JS를 안에 넣은 단일 HTML을 만듭니다. 이 파일을 Claude Artifact로 같은 URL에 다시 올리면(Artifact 도구에 같은 파일 경로 또는 `url` 지정) 데이터가 갱신될 때마다 같은 주소에서 새 버전을 볼 수 있습니다.
+
 ## 알려진 한계
 
 - 소진공 필요 서류의 전체 목록은 공고문에 없어(소진공 신청안내자료 따름) "전체 목록 미확인"으로 표시합니다. 중진공은 융자절차 안내 기준으로 단계별(기업정보입력, 융자신청, 해당 시) 서류를 보여 줍니다.

@@ -1,3 +1,4 @@
+/* Layout: filter bar and card list on the left, sticky detail panel on the right; one column on phones. */
 :root {
   --bg: #f6f7f9;
   --surface: #fff;
@@ -6,12 +7,13 @@
   --border: #d9dde4;
   --accent: #1d5fd1;
   --accent-soft: #e6eefc;
+  --on-accent: #fff;
   --warn: #8a5a00;
   --warn-bg: #fff4d6;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #14171c;
     --surface: #1d2127;
     --text: #e8eaee;
@@ -19,9 +21,25 @@
     --border: #343a44;
     --accent: #7aa7ff;
     --accent-soft: #22304d;
+    --on-accent: #0b1020;
     --warn: #f1c565;
     --warn-bg: #3a2f14;
+    color-scheme: dark;
   }
+}
+
+:root[data-theme="dark"] {
+  --bg: #14171c;
+  --surface: #1d2127;
+  --text: #e8eaee;
+  --muted: #a0a8b5;
+  --border: #343a44;
+  --accent: #7aa7ff;
+  --accent-soft: #22304d;
+  --on-accent: #0b1020;
+  --warn: #f1c565;
+  --warn-bg: #3a2f14;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -141,7 +159,7 @@ input[type="search"], select {
   display: inline-block;
   padding: 7px 14px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   border-radius: 6px;
   text-decoration: none;
 }

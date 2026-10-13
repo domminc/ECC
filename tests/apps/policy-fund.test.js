@@ -9,6 +9,7 @@ const fs = require('fs');
 const vm = require('vm');
 
 const { parseCsv, buildData, CSV_PATH, JSON_PATH, JS_PATH } = require('../../apps/policy-fund/tools/build-data');
+const { buildArtifactHtml } = require('../../apps/policy-fund/tools/build-artifact');
 
 function test(name, fn) {
   try {
@@ -98,6 +99,16 @@ function runTests() {
     const sandbox = { window: {} };
     vm.runInNewContext(fs.readFileSync(JS_PATH, 'utf8'), sandbox);
     assert.deepStrictEqual(JSON.parse(JSON.stringify(sandbox.window.POLICY_FUND_DATA)), built);
+  }));
+
+  results.push(test('artifact bundle is one self-contained fragment', () => {
+    const html = buildArtifactHtml();
+    assert.ok(/^<title>[^<]+<\/title>/.test(html), 'starts with title');
+    assert.ok(!/<(!doctype|html|head|body)[\s>]/i.test(html), 'no document wrapper');
+    assert.ok(!/<link\b|<script src=/i.test(html), 'no external files');
+    assert.strictEqual((html.match(/window\.POLICY_FUND_DATA =/g) || []).length, 1);
+    assert.ok(html.includes(built.funds[0].name));
+    assert.ok(html.includes('id="fund-list"'));
   }));
 
   const passed = results.filter(Boolean).length;
