@@ -13,7 +13,7 @@ const CSV_PATH = path.join(DATA_DIR, 'policy_funds_2026.csv');
 const JSON_PATH = path.join(DATA_DIR, 'funds.json');
 const JS_PATH = path.join(DATA_DIR, 'funds.js');
 
-const UNCONFIRMED = /공고문 확인 필요|추후 공고/;
+const UNCONFIRMED = /공고문 확인 필요|추후 공고|미확인|미기재/;
 const AGENCIES = {
   소진공: { id: 'semas', short: '소진공', defaultTargets: ['소상공인'] },
   중진공: { id: 'kosmes', short: '중진공', defaultTargets: ['중소기업'] }
@@ -22,19 +22,27 @@ const AGENCIES = {
 const META = {
   title: '2026년 정책자금 한눈에 보기',
   asOf: '2026-10-13',
-  basis: '공식 공고(기업마당) 최초 공고 기준',
+  basis: '소진공 제2026-576호·중진공 제2026-574호(2026.10.1) 통합 변경공고 기준',
   caveats: [
-    '표의 수치는 최초 공고(소진공 제2025-656호, 중진공 제2025-649호) 기준입니다. 이후 변경 공고의 한도·금리·접수 일정은 반영되지 않았습니다.',
-    '필요 서류와 공식 양식은 공고문에 목록이 없어 비어 있습니다. 각 기관 안내를 확인하세요.',
-    '금리는 분기별로 변동하는 정책자금 기준금리에 가산금리를 더하는 구조입니다. 실제 %는 기관 공지를 확인하세요.'
+    '금리는 분기별로 변동하는 정책자금 기준금리에 가산금리를 더하는 구조입니다. 실제 %는 기관 공지를 확인하세요.',
+    '소진공 필요 서류의 전체 목록은 공고문에 없고 소진공 신청안내자료를 따릅니다. 이 화면에는 확인된 서류만 표시합니다.',
+    '소진공·중진공 모두 온라인으로 신청서를 작성·제출하므로 내려받을 별도 서식 파일은 확인되지 않았습니다.',
+    '중진공 자금은 원칙적으로 소상공인이 융자제한 대상입니다(제조업·혁신성장분야 영위 등은 예외).'
   ],
   changeNotices: [
     {
-      label: '중진공 변경공고 제2026-464호 (2026.07.28) 원문',
-      url: 'https://www.bizinfo.go.kr/sii/siia/selectSIIA200Detail.do?pblancId=PBLN_000000000124795'
+      label: '소진공 제2026-576호 (2026.10.1, 변경 5차) 원문',
+      url: 'https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565'
     },
-    { label: '소진공 5차 변경 공고 (2026.10.2 등록): 원문 링크 확인 중', url: '' }
+    {
+      label: '중진공 제2026-574호 (2026.10.1) 원문',
+      url: 'https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071549&parentSeq=1071549'
+    }
   ],
+  documentGuides: {
+    소진공: { label: '정부24 소상공인 정책자금 안내', url: 'https://www.gov.kr/portal/service/serviceInfo/SD0000007429' },
+    중진공: { label: '중진공 융자절차 안내', url: 'https://www.kosmes.or.kr/nsh/SH/SBI/SHSBI003M0.do' }
+  },
   applyUrls: [
     { label: '소상공인정책자금 신청(소진공)', url: 'https://ols.semas.or.kr' },
     { label: '중진공 정책자금 신청', url: 'https://www.kosmes.or.kr' }
@@ -88,14 +96,30 @@ function agencyKey(name) {
   return key;
 }
 
+function parseDocumentGroups(text) {
+  const groups = [];
+  for (const part of text.split(' / ')) {
+    const m = part.match(/^\[(.+?)\]\s*(.*)$/) || part.match(/^(해당 시):\s*(.*)$/);
+    if (!m) return [];
+    const items = m[2]
+      .replace(/\(kosmes\.or\.kr[^)]*\)$/, '')
+      .split(', ')
+      .map(item => item.trim())
+      .filter(Boolean);
+    if (items.length === 0) return [];
+    groups.push({ stage: m[1], items });
+  }
+  return groups;
+}
+
 function buildData(csvText) {
   const [header, ...rows] = parseCsv(csvText);
-  if (header.length !== 12) {
-    throw new Error(`Expected 12 columns, got ${header.length}`);
+  if (header.length !== 15) {
+    throw new Error(`Expected 15 columns, got ${header.length}`);
   }
   const counters = {};
   const funds = rows.map(cols => {
-    const [agencyName, group, name, conditions, limit, rate, term, method, docs, pages, noticeUrl, pdfUrl] =
+    const [agencyName, group, name, conditions, limit, rate, term, method, docs, formNote, pages, baseNotice, noticeUrl, pdfUrl, changeMemo] =
       cols.map(c => c.trim());
     const key = agencyKey(agencyName);
     const agency = AGENCIES[key];
@@ -118,7 +142,7 @@ function buildData(csvText) {
       rate,
       term,
       method,
-      documents: [],
+      documentGroups: parseDocumentGroups(docs),
       documentsNote: docs,
       unconfirmed: {
         limit: UNCONFIRMED.test(limit) || limit === '-',
@@ -126,7 +150,10 @@ function buildData(csvText) {
         term: UNCONFIRMED.test(term) || term === '-'
       },
       forms: [],
+      formNote,
+      changeMemo,
       pages,
+      baseNotice,
       noticeUrl,
       pdfUrl
     };

@@ -68,9 +68,29 @@ function runTests() {
   }));
 
   results.push(test('unconfirmed values are flagged, not invented', () => {
-    const flagged = built.funds.filter(f => f.unconfirmed.limit || f.unconfirmed.rate);
+    const flagged = built.funds.filter(f => f.unconfirmed.limit || f.unconfirmed.rate || f.unconfirmed.term);
     assert.ok(flagged.length > 0);
-    assert.ok(built.funds.every(f => f.documents.length === 0 && f.forms.length === 0));
+    assert.ok(flagged.every(f => /미확인|미기재|확인 필요|추후/.test(`${f.limit}${f.rate}${f.term}`)));
+    assert.ok(built.funds.every(f => f.forms.length === 0), 'no form links until confirmed');
+  }));
+
+  results.push(test('KOSMES documents are parsed into stages; SEMAS list stays unconfirmed', () => {
+    for (const f of built.funds) {
+      if (f.agency === '중진공') {
+        assert.ok(f.documentGroups.length >= 2, `${f.id} groups`);
+        for (const g of f.documentGroups) {
+          assert.ok(g.stage && g.items.length > 0 && g.items.every(Boolean), `${f.id} ${g.stage}`);
+        }
+      } else {
+        assert.strictEqual(f.documentGroups.length, 0, `${f.id} should not invent a document list`);
+        assert.ok(/미확인/.test(f.documentsNote), `${f.id} note`);
+      }
+    }
+  }));
+
+  results.push(test('change memos and base notice are carried through', () => {
+    assert.ok(built.funds.some(f => f.changeMemo));
+    assert.ok(built.funds.every(f => f.baseNotice && f.formNote));
   }));
 
   results.push(test('committed funds.json and funds.js are in sync with the CSV', () => {

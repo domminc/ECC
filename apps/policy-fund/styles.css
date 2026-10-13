@@ -134,6 +134,7 @@ input[type="search"], select {
 .detail-pane dt { color: var(--muted); }
 .detail-pane dd { margin: 0; }
 .detail-pane ul { margin: 6px 0 0; padding-left: 20px; }
+.doc-stage { margin: 8px 0 0; font-weight: 600; font-size: 13px; color: var(--muted); }
 .placeholder, .empty { color: var(--muted); }
 
 .btn {

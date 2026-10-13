@@ -58,7 +58,7 @@
 
   function valueNode(text, unconfirmed) {
     if (!unconfirmed) return document.createTextNode(text);
-    return node('span', { class: 'tag warn', text: '공고문 확인 필요' });
+    return node('span', { class: 'tag warn', title: text, text: '공고문 확인 필요' });
   }
 
   function renderList() {
@@ -70,6 +70,7 @@
         node('span', { class: 'name', text: f.name }),
         node('span', { class: 'meta' }, [
           node('span', { class: 'tag', text: f.agency }),
+          f.changeMemo ? node('span', { class: 'tag warn', text: '변경 있음' }) : null,
           node('span', { text: f.group }),
           node('span', {}, [document.createTextNode('한도 '), valueNode(f.limit, f.unconfirmed.limit)]),
           node('span', {}, [document.createTextNode('금리 '), valueNode(f.rate, f.unconfirmed.rate)])
@@ -99,25 +100,34 @@
     row(dl, '방식', document.createTextNode(f.method));
 
     var docs = node('div');
-    if (f.documents.length) {
-      var ul = node('ul');
-      f.documents.forEach(function (d) { ul.appendChild(node('li', { text: d })); });
-      docs.appendChild(ul);
+    if (f.documentGroups.length) {
+      f.documentGroups.forEach(function (g) {
+        var ul = node('ul');
+        g.items.forEach(function (d) { ul.appendChild(node('li', { text: d })); });
+        docs.appendChild(node('p', { class: 'doc-stage', text: g.stage }));
+        docs.appendChild(ul);
+      });
     } else {
-      docs.appendChild(node('span', { class: 'tag warn', text: '공고문 확인 필요' }));
+      docs.appendChild(node('span', { class: 'tag warn', text: '전체 목록 미확인' }));
+      if (f.documentsNote) docs.appendChild(node('p', { class: 'muted', text: f.documentsNote }));
     }
-    if (f.documentsNote) docs.appendChild(node('p', { class: 'muted', text: f.documentsNote }));
+    var guide = data.meta.documentGuides[f.agency];
+    if (guide) docs.appendChild(node('p', { class: 'muted' }, [document.createTextNode('안내: '), safeLink(guide.url, guide.label)]));
 
     var forms = node('div', { class: 'btn-row' });
     f.forms.forEach(function (form) { add(forms, safeLink(form.url, form.label, 'btn')); });
     add(forms, safeLink(f.pdfUrl, '공고문 원문 PDF 내려받기', 'btn'));
-    var formNote = f.forms.length ? null : node('p', { class: 'muted', text: '공식 서류 양식·샘플 링크는 아직 확인되지 않았습니다. 공고문과 기관 안내를 확인하세요.' });
+    var formNote = f.formNote ? node('p', { class: 'muted', text: f.formNote }) : null;
 
     pane.appendChild(node('span', { class: 'tag', text: f.agencyFull + ' · ' + f.group }));
     pane.appendChild(node('h2', { text: f.name }));
     pane.appendChild(dl);
     pane.appendChild(node('h3', { text: '신청 조건' }));
     pane.appendChild(node('p', { text: f.conditions }));
+    if (f.changeMemo) {
+      pane.appendChild(node('h3', { text: '최초 공고 대비 변경' }));
+      pane.appendChild(node('p', { text: f.changeMemo }));
+    }
     pane.appendChild(node('h3', { text: '필요 서류' }));
     pane.appendChild(docs);
     pane.appendChild(node('h3', { text: '서류 양식·샘플 내려받기' }));
@@ -125,8 +135,8 @@
     add(pane, formNote);
     pane.appendChild(node('h3', { text: '출처' }));
     pane.appendChild(node('p', {}, [
-      document.createTextNode('공고문 ' + f.pages + ' · '),
-      safeLink(f.noticeUrl, '기업마당 공고 원문')
+      document.createTextNode(f.baseNotice + ' ' + f.pages + ' · '),
+      safeLink(f.noticeUrl, '공고 원문 페이지')
     ]));
     if (window.matchMedia('(max-width: 800px)').matches) pane.scrollIntoView({ behavior: 'smooth' });
   }

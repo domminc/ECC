@@ -3,22 +3,33 @@ window.POLICY_FUND_DATA = {
   "meta": {
     "title": "2026년 정책자금 한눈에 보기",
     "asOf": "2026-10-13",
-    "basis": "공식 공고(기업마당) 최초 공고 기준",
+    "basis": "소진공 제2026-576호·중진공 제2026-574호(2026.10.1) 통합 변경공고 기준",
     "caveats": [
-      "표의 수치는 최초 공고(소진공 제2025-656호, 중진공 제2025-649호) 기준입니다. 이후 변경 공고의 한도·금리·접수 일정은 반영되지 않았습니다.",
-      "필요 서류와 공식 양식은 공고문에 목록이 없어 비어 있습니다. 각 기관 안내를 확인하세요.",
-      "금리는 분기별로 변동하는 정책자금 기준금리에 가산금리를 더하는 구조입니다. 실제 %는 기관 공지를 확인하세요."
+      "금리는 분기별로 변동하는 정책자금 기준금리에 가산금리를 더하는 구조입니다. 실제 %는 기관 공지를 확인하세요.",
+      "소진공 필요 서류의 전체 목록은 공고문에 없고 소진공 신청안내자료를 따릅니다. 이 화면에는 확인된 서류만 표시합니다.",
+      "소진공·중진공 모두 온라인으로 신청서를 작성·제출하므로 내려받을 별도 서식 파일은 확인되지 않았습니다.",
+      "중진공 자금은 원칙적으로 소상공인이 융자제한 대상입니다(제조업·혁신성장분야 영위 등은 예외)."
     ],
     "changeNotices": [
       {
-        "label": "중진공 변경공고 제2026-464호 (2026.07.28) 원문",
-        "url": "https://www.bizinfo.go.kr/sii/siia/selectSIIA200Detail.do?pblancId=PBLN_000000000124795"
+        "label": "소진공 제2026-576호 (2026.10.1, 변경 5차) 원문",
+        "url": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565"
       },
       {
-        "label": "소진공 5차 변경 공고 (2026.10.2 등록): 원문 링크 확인 중",
-        "url": ""
+        "label": "중진공 제2026-574호 (2026.10.1) 원문",
+        "url": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071549&parentSeq=1071549"
       }
     ],
+    "documentGuides": {
+      "소진공": {
+        "label": "정부24 소상공인 정책자금 안내",
+        "url": "https://www.gov.kr/portal/service/serviceInfo/SD0000007429"
+      },
+      "중진공": {
+        "label": "중진공 융자절차 안내",
+        "url": "https://www.kosmes.or.kr/nsh/SH/SBI/SHSBI003M0.do"
+      }
+    },
     "applyUrls": [
       {
         "label": "소상공인정책자금 신청(소진공)",
@@ -45,17 +56,20 @@ window.POLICY_FUND_DATA = {
       "rate": "기준금리+0.6%p(변동)",
       "term": "5년(2년)",
       "method": "대리대출",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "",
       "pages": "p6",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
       "id": "semas-02",
@@ -67,21 +81,24 @@ window.POLICY_FUND_DATA = {
         "소상공인"
       ],
       "conditions": "재해확인증을 발급받은 소상공인",
-      "limit": "1억원",
-      "rate": "연 2.0%(고정)",
-      "term": "5년(2년)",
+      "limit": "1억원(거제·통영 특별재난지역 특별지원: 최대 3억원)",
+      "rate": "연 2.0%(고정). 거제·통영 특별지원: 대리 1.4%/직접 1.5%",
+      "term": "5년(2년). 거제·통영: 10년(5년 거치)",
       "method": "대리대출(체납처분 유예 등은 직접)",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
-      "pages": "p7-9",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "5차 변경에서 거제·통영 특별지원 추가",
+      "pages": "p8-9",
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
       "id": "semas-03",
@@ -92,25 +109,57 @@ window.POLICY_FUND_DATA = {
       "targets": [
         "소상공인"
       ],
-      "conditions": "매출 15% 이상 감소 등 경영애로 소상공인(예외 사유 별도)",
+      "conditions": "매출 15% 이상 감소 소상공인. 예외: 고용위기·산업위기·특별지원지역·상권활성화구역 소재 등",
       "limit": "7천만원",
       "rate": "기준금리(변동)",
       "term": "5년(2년)",
       "method": "대리대출(연매출 1.04억 미만·업력 7년 미만은 직접)",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
-      "pages": "p7-9",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "매출감소 확인 예외 사유가 7개로 확대(홈플러스 항목은 별도 자금으로 분리)",
+      "pages": "p8-9",
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
       "id": "semas-04",
+      "agency": "소진공",
+      "agencyFull": "소진공(소상공인시장진흥공단)",
+      "group": "특별경영안정",
+      "name": "긴급경영안정(홈플러스 피해)",
+      "targets": [
+        "소상공인"
+      ],
+      "conditions": "홈플러스 피해 소상공인",
+      "limit": "1억원",
+      "rate": "기준금리-0.5%p(변동)",
+      "term": "5년(2년)",
+      "method": "직접대출",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
+      "unconfirmed": {
+        "limit": false,
+        "rate": false,
+        "term": false
+      },
+      "forms": [],
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "5차 변경 신설 항목(원 공고에서는 매출감소 예외 사유였음)",
+      "pages": "p7-9",
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
+    },
+    {
+      "id": "semas-05",
       "agency": "소진공",
       "agencyFull": "소진공(소상공인시장진흥공단)",
       "group": "특별경영안정",
@@ -120,23 +169,26 @@ window.POLICY_FUND_DATA = {
       ],
       "conditions": "신용관리 교육 이수한 중·저신용(NCB 839점 이하) 소상공인",
       "limit": "3천만원",
-      "rate": "기준금리+1.6%p(1년 후 신용 70점 상승 등 시 0.5%p 인하)",
+      "rate": "기준금리+1.6%p(1년 후 신용 70점 상승 또는 840점 회복 시 0.5%p 인하 신청 가능)",
       "term": "5년(2년)",
       "method": "직접대출",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "규모 6,000억→7,000억",
       "pages": "p10",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
-      "id": "semas-05",
+      "id": "semas-06",
       "agency": "소진공",
       "agencyFull": "소진공(소상공인시장진흥공단)",
       "group": "특별경영안정",
@@ -149,20 +201,23 @@ window.POLICY_FUND_DATA = {
       "rate": "연 4.5%(고정)",
       "term": "10년(비거치 또는 2년 거치)",
       "method": "대리대출",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "",
       "pages": "p11-12",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
-      "id": "semas-06",
+      "id": "semas-07",
       "agency": "소진공",
       "agencyFull": "소진공(소상공인시장진흥공단)",
       "group": "특별경영안정",
@@ -175,20 +230,23 @@ window.POLICY_FUND_DATA = {
       "rate": "기준금리+1.6%p",
       "term": "5년(2년)",
       "method": "직접대출",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "",
       "pages": "p13-14",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
-      "id": "semas-07",
+      "id": "semas-08",
       "agency": "소진공",
       "agencyFull": "소진공(소상공인시장진흥공단)",
       "group": "특별경영안정",
@@ -201,20 +259,23 @@ window.POLICY_FUND_DATA = {
       "rate": "기준금리+0.6%p",
       "term": "5년(2년)",
       "method": "직접대출",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "",
       "pages": "p14",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
-      "id": "semas-08",
+      "id": "semas-09",
       "agency": "소진공",
       "agencyFull": "소진공(소상공인시장진흥공단)",
       "group": "특별경영안정",
@@ -227,20 +288,23 @@ window.POLICY_FUND_DATA = {
       "rate": "기준금리+0.4%p",
       "term": "5년(2년)",
       "method": "직접대출",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "",
       "pages": "p14",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
-      "id": "semas-09",
+      "id": "semas-10",
       "agency": "소진공",
       "agencyFull": "소진공(소상공인시장진흥공단)",
       "group": "특별경영안정",
@@ -253,20 +317,23 @@ window.POLICY_FUND_DATA = {
       "rate": "연 2.0%(고정)",
       "term": "7년(2년)",
       "method": "대리대출",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "",
       "pages": "p15",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
-      "id": "semas-10",
+      "id": "semas-11",
       "agency": "소진공",
       "agencyFull": "소진공(소상공인시장진흥공단)",
       "group": "특별경영안정",
@@ -279,24 +346,27 @@ window.POLICY_FUND_DATA = {
       "rate": "기준금리(변동)",
       "term": "5년(2년)",
       "method": "대리대출",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "규모 1,500억→3,000억",
       "pages": "p16",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
-      "id": "semas-11",
+      "id": "semas-12",
       "agency": "소진공",
       "agencyFull": "소진공(소상공인시장진흥공단)",
       "group": "성장기반",
-      "name": "소공인특화자금(일반)",
+      "name": "소공인특화자금",
       "targets": [
         "소상공인"
       ],
@@ -305,43 +375,20 @@ window.POLICY_FUND_DATA = {
       "rate": "기준금리+0.6%p",
       "term": "운전 5년(2년) / 시설 8년(3년)",
       "method": "대리대출",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
-      "pages": "p17-19",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
-    },
-    {
-      "id": "semas-12",
-      "agency": "소진공",
-      "agencyFull": "소진공(소상공인시장진흥공단)",
-      "group": "성장기반",
-      "name": "소공인특화자금(유망)",
-      "targets": [
-        "소상공인"
-      ],
-      "conditions": "소공인특화지원 참여·백년소공인 선정 소공인",
-      "limit": "운전 2억 / 시설 10억",
-      "rate": "기준금리+0.4%p",
-      "term": "운전 5년(2년) / 시설 8년(3년)",
-      "method": "직접대출",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
-      "unconfirmed": {
-        "limit": false,
-        "rate": false,
-        "term": false
-      },
-      "forms": [],
-      "pages": "p17-19",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "5차 변경으로 '유망형(직접대출, 운전2억/시설10억)' 삭제됨 → 일반형만 존치",
+      "pages": "p17-18",
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
       "id": "semas-13",
@@ -352,22 +399,25 @@ window.POLICY_FUND_DATA = {
       "targets": [
         "소상공인"
       ],
-      "conditions": "수출·2년 연속 매출 10%+ 신장·스마트공장·졸업후보기업·직접대출 성실상환 등",
+      "conditions": "수출·2년 연속 매출 10%+ 신장·스마트공장·강한소상공인/로컬크리에이터·졸업후보기업·직접대출 성실상환",
       "limit": "운전 2억 / 시설 10억",
       "rate": "기준금리+0.4%p",
       "term": "운전 5년(2년) / 시설 8년(3년)",
       "method": "직접대출",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
-      "pages": "p20-21",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "",
+      "pages": "p19-20",
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
       "id": "semas-14",
@@ -378,22 +428,25 @@ window.POLICY_FUND_DATA = {
       "targets": [
         "소상공인"
       ],
-      "conditions": "스마트기술·백년가게·사회연대경제 조직·신사업창업사관학교 수료생",
+      "conditions": "스마트기술·백년소상공인·사회연대경제 조직·신사업창업사관학교 수료생",
       "limit": "운전 1억 / 시설 5억",
       "rate": "기준금리+0.4%p",
       "term": "운전 5년(2년) / 시설 8년(3년)",
       "method": "직접대출",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
-      "pages": "p20-21",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "명칭 '백년가게'→'백년소상공인'",
+      "pages": "p19-20",
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
       "id": "semas-15",
@@ -409,17 +462,20 @@ window.POLICY_FUND_DATA = {
       "rate": "기준금리+0.4%p",
       "term": "8년(3년)",
       "method": "직접대출",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
-      "pages": "p22",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "",
+      "pages": "p21",
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
       "id": "semas-16",
@@ -430,22 +486,25 @@ window.POLICY_FUND_DATA = {
       "targets": [
         "소상공인"
       ],
-      "conditions": "TOPS 1·2단계, 상생협약 플랫폼 추천, POST-TOPS 선정 소상공인",
+      "conditions": "일반형: TOPS 1단계 / 성장형: TOPS 2단계·상생협약 플랫폼 추천 / 도약형: 2026 브랜드 소상공인 점프업 선정",
       "limit": "일반 운전7천만 / 성장 운전1억·시설5억 / 도약 운전2억·시설10억",
       "rate": "기준금리+0.4%p",
       "term": "운전 5년(2년) / 시설 8년(3년)",
       "method": "직접대출",
-      "documents": [],
-      "documentsNote": "공고문에 서류 목록 없음(소진공 신청안내자료 확인 필요)",
+      "documentGroups": [],
+      "documentsNote": "신청서, 사업자등록증 등(정부24 안내, 전체 목록은 공고에 없고 소진공 신청안내자료 따름 — 미확인)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
-      "pages": "p17,23",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000117021",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739468&fileSn=0"
+      "formNote": "서식 다운로드 링크 미확인(온라인 ols.semas.or.kr 신청)",
+      "changeMemo": "규모 760억→260억, 도약형 대상이 POST-TOPS→브랜드 소상공인 점프업으로 변경",
+      "pages": "p17,22",
+      "baseNotice": "소진공 제2026-576호(2026.10.1, 변경 5차 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071565&parentSeq=1071565",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071565&cbIdx=310&streFileNm=a31f87b4-fb81-4e45-ad0d-acbf45485a62.pdf"
     },
     {
       "id": "kosmes-01",
@@ -456,22 +515,55 @@ window.POLICY_FUND_DATA = {
       "targets": [
         "중소기업"
       ],
-      "conditions": "창업자(업력 7년 미만, 예비창업자 포함) 등. ※ 원칙적으로 소상공인은 지원제외(융자제한), 중소기업기본법상 중소기업 대상. 소상공인은 일부 자금(내수기업 수출기업화 등)만 예외 허용",
-      "limit": "연 60억 이내(운전 연 5억)",
+      "conditions": "중소기업창업지원법상 창업자(업력 7년 미만, 예비창업자 포함) 등. ※ 소상공인(상시근로자 제조업 등 10명 미만, 그 외 5명 미만)은 원칙적 융자제한이나 제조업·혁신성장분야 영위 등은 예외",
+      "limit": "직접·대리 연 60억 이내(운전 연 5억)",
       "rate": "기준금리(변동)-0.3%p",
       "term": "시설 10년(담보4/신용3년 거치), 운전 5년(2년)",
-      "method": "직접·대리·투자조건부융자",
-      "documents": [],
-      "documentsNote": "신청서+증빙서류. 상담 후 개별 안내, 온라인 신청 시 대표자 신분증 진위확인 후 필수서류 자동제출(공고문 참고자료 p44-45)",
+      "method": "직접·대리·성장공유형·투자조건부융자",
+      "documentGroups": [
+        {
+          "stage": "기업정보입력",
+          "items": [
+            "대표자 신분증 사본(앞면)",
+            "사업자등록증",
+            "표준재무제표",
+            "원천세신고자료",
+            "신용정보 제공·활용 동의서"
+          ]
+        },
+        {
+          "stage": "융자신청",
+          "items": [
+            "사업자등록증명원",
+            "표준재무제표증명원",
+            "국세·지방세 납세증명서",
+            "4대보험 완납증명서",
+            "법인등기부등본",
+            "고용보험가입자명부"
+          ]
+        },
+        {
+          "stage": "해당 시",
+          "items": [
+            "시설자금 견적서·계약서·도면",
+            "자금별 요건 확인서류",
+            "우대금리 증빙"
+          ]
+        }
+      ],
+      "documentsNote": "[기업정보입력] 대표자 신분증 사본(앞면), 사업자등록증, 표준재무제표, 원천세신고자료, 신용정보 제공·활용 동의서 / [융자신청] 사업자등록증명원, 표준재무제표증명원, 국세·지방세 납세증명서, 4대보험 완납증명서, 법인등기부등본, 고용보험가입자명부 / 해당 시: 시설자금 견적서·계약서·도면, 자금별 요건 확인서류, 우대금리 증빙(kosmes.or.kr 융자절차 페이지 기준)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
-      "pages": "p16",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000116941",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739124&fileSn=0"
+      "formNote": "융자신청서는 중진공 누리집에서 온라인 작성·제출(별도 다운로드 서식 없음)",
+      "changeMemo": "",
+      "pages": "p17",
+      "baseNotice": "중진공 제2026-574호(2026.10.1, 변경공고 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071549&parentSeq=1071549",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071549&cbIdx=310&streFileNm=142e9dab-f50f-470e-9a95-7bac4088ce38.pdf"
     },
     {
       "id": "kosmes-02",
@@ -482,22 +574,55 @@ window.POLICY_FUND_DATA = {
       "targets": [
         "중소기업"
       ],
-      "conditions": "대표자 만39세 이하, 업력 3년 미만 중소기업",
-      "limit": "공고문 확인 필요(본 조사에서 미확인)",
-      "rate": "공고문 확인 필요",
-      "term": "공고문 확인 필요",
-      "method": "공고문 확인 필요",
-      "documents": [],
-      "documentsNote": "신청서+증빙서류. 상담 후 개별 안내, 온라인 신청 시 대표자 신분증 진위확인 후 필수서류 자동제출(공고문 참고자료 p44-45)",
+      "conditions": "대표자 만39세 이하, 업력 3년 미만 중소기업(또는 창업하는 자). 심의위원회 평가 후 결정",
+      "limit": "기업당 최대 1억(제조업·중점지원분야 2억)",
+      "rate": "연 2.5%(고정)",
+      "term": "시설 10년(담보4/신용3년 거치), 운전 6년(3년)",
+      "method": "직접대출",
+      "documentGroups": [
+        {
+          "stage": "기업정보입력",
+          "items": [
+            "대표자 신분증 사본(앞면)",
+            "사업자등록증",
+            "표준재무제표",
+            "원천세신고자료",
+            "신용정보 제공·활용 동의서"
+          ]
+        },
+        {
+          "stage": "융자신청",
+          "items": [
+            "사업자등록증명원",
+            "표준재무제표증명원",
+            "국세·지방세 납세증명서",
+            "4대보험 완납증명서",
+            "법인등기부등본",
+            "고용보험가입자명부"
+          ]
+        },
+        {
+          "stage": "해당 시",
+          "items": [
+            "시설자금 견적서·계약서·도면",
+            "자금별 요건 확인서류",
+            "우대금리 증빙"
+          ]
+        }
+      ],
+      "documentsNote": "[기업정보입력] 대표자 신분증 사본(앞면), 사업자등록증, 표준재무제표, 원천세신고자료, 신용정보 제공·활용 동의서 / [융자신청] 사업자등록증명원, 표준재무제표증명원, 국세·지방세 납세증명서, 4대보험 완납증명서, 법인등기부등본, 고용보험가입자명부 / 해당 시: 시설자금 견적서·계약서·도면, 자금별 요건 확인서류, 우대금리 증빙(kosmes.or.kr 융자절차 페이지 기준)",
       "unconfirmed": {
-        "limit": true,
-        "rate": true,
-        "term": true
+        "limit": false,
+        "rate": false,
+        "term": false
       },
       "forms": [],
-      "pages": "p17",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000116941",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739124&fileSn=0"
+      "formNote": "융자신청서는 중진공 누리집에서 온라인 작성·제출(별도 다운로드 서식 없음)",
+      "changeMemo": "",
+      "pages": "p18",
+      "baseNotice": "중진공 제2026-574호(2026.10.1, 변경공고 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071549&parentSeq=1071549",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071549&cbIdx=310&streFileNm=142e9dab-f50f-470e-9a95-7bac4088ce38.pdf"
     },
     {
       "id": "kosmes-03",
@@ -510,21 +635,54 @@ window.POLICY_FUND_DATA = {
         "소상공인"
       ],
       "conditions": "수출실적 10만불 미만 중소기업(소상공인 포함 가능)",
-      "limit": "직접대출 운전 연 10억 이내",
-      "rate": "공고문 확인 필요",
+      "limit": "직접대출 운전 연 10억 이내(해외법인지원 성장공유형 연 50억 이내)",
+      "rate": "기준금리(변동) 또는 고정금리",
       "term": "5년(2년)",
-      "method": "직접대출",
-      "documents": [],
-      "documentsNote": "신청서+증빙서류. 상담 후 개별 안내, 온라인 신청 시 대표자 신분증 진위확인 후 필수서류 자동제출(공고문 참고자료 p44-45)",
+      "method": "직접대출·성장공유형",
+      "documentGroups": [
+        {
+          "stage": "기업정보입력",
+          "items": [
+            "대표자 신분증 사본(앞면)",
+            "사업자등록증",
+            "표준재무제표",
+            "원천세신고자료",
+            "신용정보 제공·활용 동의서"
+          ]
+        },
+        {
+          "stage": "융자신청",
+          "items": [
+            "사업자등록증명원",
+            "표준재무제표증명원",
+            "국세·지방세 납세증명서",
+            "4대보험 완납증명서",
+            "법인등기부등본",
+            "고용보험가입자명부"
+          ]
+        },
+        {
+          "stage": "해당 시",
+          "items": [
+            "시설자금 견적서·계약서·도면",
+            "자금별 요건 확인서류",
+            "우대금리 증빙"
+          ]
+        }
+      ],
+      "documentsNote": "[기업정보입력] 대표자 신분증 사본(앞면), 사업자등록증, 표준재무제표, 원천세신고자료, 신용정보 제공·활용 동의서 / [융자신청] 사업자등록증명원, 표준재무제표증명원, 국세·지방세 납세증명서, 4대보험 완납증명서, 법인등기부등본, 고용보험가입자명부 / 해당 시: 시설자금 견적서·계약서·도면, 자금별 요건 확인서류, 우대금리 증빙(kosmes.or.kr 융자절차 페이지 기준)",
       "unconfirmed": {
         "limit": false,
-        "rate": true,
+        "rate": false,
         "term": false
       },
       "forms": [],
-      "pages": "p19-20",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000116941",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739124&fileSn=0"
+      "formNote": "융자신청서는 중진공 누리집에서 온라인 작성·제출(별도 다운로드 서식 없음)",
+      "changeMemo": "",
+      "pages": "p20",
+      "baseNotice": "중진공 제2026-574호(2026.10.1, 변경공고 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071549&parentSeq=1071549",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071549&cbIdx=310&streFileNm=142e9dab-f50f-470e-9a95-7bac4088ce38.pdf"
     },
     {
       "id": "kosmes-04",
@@ -535,22 +693,55 @@ window.POLICY_FUND_DATA = {
       "targets": [
         "중소기업"
       ],
-      "conditions": "업력 7년 이상 중소기업 등",
-      "limit": "공고문 확인 필요",
-      "rate": "공고문 확인 필요",
-      "term": "공고문 확인 필요",
-      "method": "직접·대리·이차보전",
-      "documents": [],
-      "documentsNote": "신청서+증빙서류. 상담 후 개별 안내, 온라인 신청 시 대표자 신분증 진위확인 후 필수서류 자동제출(공고문 참고자료 p44-45)",
+      "conditions": "업력 7년 이상 중소기업(창업자 비해당 7년 미만 포함)",
+      "limit": "직접·대리 연 60억 이내(운전 연 5억, 시설자금의 50% 이내)",
+      "rate": "기준금리(변동)+0.5%p",
+      "term": "시설 10년(담보4/신용3년 거치), 운전 5년(2년)",
+      "method": "직접·대리·성장공유형·이차보전",
+      "documentGroups": [
+        {
+          "stage": "기업정보입력",
+          "items": [
+            "대표자 신분증 사본(앞면)",
+            "사업자등록증",
+            "표준재무제표",
+            "원천세신고자료",
+            "신용정보 제공·활용 동의서"
+          ]
+        },
+        {
+          "stage": "융자신청",
+          "items": [
+            "사업자등록증명원",
+            "표준재무제표증명원",
+            "국세·지방세 납세증명서",
+            "4대보험 완납증명서",
+            "법인등기부등본",
+            "고용보험가입자명부"
+          ]
+        },
+        {
+          "stage": "해당 시",
+          "items": [
+            "시설자금 견적서·계약서·도면",
+            "자금별 요건 확인서류",
+            "우대금리 증빙"
+          ]
+        }
+      ],
+      "documentsNote": "[기업정보입력] 대표자 신분증 사본(앞면), 사업자등록증, 표준재무제표, 원천세신고자료, 신용정보 제공·활용 동의서 / [융자신청] 사업자등록증명원, 표준재무제표증명원, 국세·지방세 납세증명서, 4대보험 완납증명서, 법인등기부등본, 고용보험가입자명부 / 해당 시: 시설자금 견적서·계약서·도면, 자금별 요건 확인서류, 우대금리 증빙(kosmes.or.kr 융자절차 페이지 기준)",
       "unconfirmed": {
-        "limit": true,
-        "rate": true,
-        "term": true
+        "limit": false,
+        "rate": false,
+        "term": false
       },
       "forms": [],
-      "pages": "p21-25",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000116941",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739124&fileSn=0"
+      "formNote": "융자신청서는 중진공 누리집에서 온라인 작성·제출(별도 다운로드 서식 없음)",
+      "changeMemo": "",
+      "pages": "p22",
+      "baseNotice": "중진공 제2026-574호(2026.10.1, 변경공고 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071549&parentSeq=1071549",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071549&cbIdx=310&streFileNm=142e9dab-f50f-470e-9a95-7bac4088ce38.pdf"
     },
     {
       "id": "kosmes-05",
@@ -562,21 +753,54 @@ window.POLICY_FUND_DATA = {
         "중소기업"
       ],
       "conditions": "사업전환계획 승인일로부터 5년 미만 중소기업(상시근로자 5인 이상)",
-      "limit": "공고문 확인 필요",
-      "rate": "공고문 확인 필요",
-      "term": "공고문 확인 필요",
-      "method": "공고문 확인 필요",
-      "documents": [],
-      "documentsNote": "신청서+증빙서류. 상담 후 개별 안내, 온라인 신청 시 대표자 신분증 진위확인 후 필수서류 자동제출(공고문 참고자료 p44-45)",
+      "limit": "연 100억 이내(운전 연 5억)",
+      "rate": "기준금리(변동)",
+      "term": "시설 10년(담보5/신용4년 거치), 운전 6년(3년)",
+      "method": "직접·대리",
+      "documentGroups": [
+        {
+          "stage": "기업정보입력",
+          "items": [
+            "대표자 신분증 사본(앞면)",
+            "사업자등록증",
+            "표준재무제표",
+            "원천세신고자료",
+            "신용정보 제공·활용 동의서"
+          ]
+        },
+        {
+          "stage": "융자신청",
+          "items": [
+            "사업자등록증명원",
+            "표준재무제표증명원",
+            "국세·지방세 납세증명서",
+            "4대보험 완납증명서",
+            "법인등기부등본",
+            "고용보험가입자명부"
+          ]
+        },
+        {
+          "stage": "해당 시",
+          "items": [
+            "시설자금 견적서·계약서·도면",
+            "자금별 요건 확인서류",
+            "우대금리 증빙"
+          ]
+        }
+      ],
+      "documentsNote": "[기업정보입력] 대표자 신분증 사본(앞면), 사업자등록증, 표준재무제표, 원천세신고자료, 신용정보 제공·활용 동의서 / [융자신청] 사업자등록증명원, 표준재무제표증명원, 국세·지방세 납세증명서, 4대보험 완납증명서, 법인등기부등본, 고용보험가입자명부 / 해당 시: 시설자금 견적서·계약서·도면, 자금별 요건 확인서류, 우대금리 증빙(kosmes.or.kr 융자절차 페이지 기준)",
       "unconfirmed": {
-        "limit": true,
-        "rate": true,
-        "term": true
+        "limit": false,
+        "rate": false,
+        "term": false
       },
       "forms": [],
-      "pages": "p26-31",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000116941",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739124&fileSn=0"
+      "formNote": "융자신청서는 중진공 누리집에서 온라인 작성·제출(별도 다운로드 서식 없음)",
+      "changeMemo": "",
+      "pages": "p27-28",
+      "baseNotice": "중진공 제2026-574호(2026.10.1, 변경공고 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071549&parentSeq=1071549",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071549&cbIdx=310&streFileNm=142e9dab-f50f-470e-9a95-7bac4088ce38.pdf"
     },
     {
       "id": "kosmes-06",
@@ -589,23 +813,115 @@ window.POLICY_FUND_DATA = {
       ],
       "conditions": "재해중소기업 확인증 발급 중소기업",
       "limit": "피해금액 이내 최대 10억(3년간 15억)",
-      "rate": "1.9%(고정)",
+      "rate": "1.9%(고정). 거제·통영 특별재난지역 특별지원 1.5%(고정)",
       "term": "5년(2년)",
       "method": "직접대출",
-      "documents": [],
-      "documentsNote": "신청서+증빙서류. 상담 후 개별 안내, 온라인 신청 시 대표자 신분증 진위확인 후 필수서류 자동제출(공고문 참고자료 p44-45)",
+      "documentGroups": [
+        {
+          "stage": "기업정보입력",
+          "items": [
+            "대표자 신분증 사본(앞면)",
+            "사업자등록증",
+            "표준재무제표",
+            "원천세신고자료",
+            "신용정보 제공·활용 동의서"
+          ]
+        },
+        {
+          "stage": "융자신청",
+          "items": [
+            "사업자등록증명원",
+            "표준재무제표증명원",
+            "국세·지방세 납세증명서",
+            "4대보험 완납증명서",
+            "법인등기부등본",
+            "고용보험가입자명부"
+          ]
+        },
+        {
+          "stage": "해당 시",
+          "items": [
+            "시설자금 견적서·계약서·도면",
+            "자금별 요건 확인서류",
+            "우대금리 증빙"
+          ]
+        }
+      ],
+      "documentsNote": "[기업정보입력] 대표자 신분증 사본(앞면), 사업자등록증, 표준재무제표, 원천세신고자료, 신용정보 제공·활용 동의서 / [융자신청] 사업자등록증명원, 표준재무제표증명원, 국세·지방세 납세증명서, 4대보험 완납증명서, 법인등기부등본, 고용보험가입자명부 / 해당 시: 시설자금 견적서·계약서·도면, 자금별 요건 확인서류, 우대금리 증빙(kosmes.or.kr 융자절차 페이지 기준)",
       "unconfirmed": {
         "limit": false,
         "rate": false,
         "term": false
       },
       "forms": [],
-      "pages": "p32",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000116941",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739124&fileSn=0"
+      "formNote": "융자신청서는 중진공 누리집에서 온라인 작성·제출(별도 다운로드 서식 없음)",
+      "changeMemo": "574호에서 거제·통영 1.5% 추가",
+      "pages": "p33",
+      "baseNotice": "중진공 제2026-574호(2026.10.1, 변경공고 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071549&parentSeq=1071549",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071549&cbIdx=310&streFileNm=142e9dab-f50f-470e-9a95-7bac4088ce38.pdf"
     },
     {
       "id": "kosmes-07",
+      "agency": "중진공",
+      "agencyFull": "중진공(중소벤처기업진흥공단)",
+      "group": "긴급경영안정",
+      "name": "긴급경영안정자금(일시적 경영애로)",
+      "targets": [
+        "중소기업"
+      ],
+      "conditions": "매출액·영업이익 10% 이상 감소 등 경영애로 중소기업(신청기한: 피해 발생 후 6개월 이내)",
+      "limit": "10억 이내(3년간 15억)",
+      "rate": "기준금리(변동)+0.5%p(홈플러스 피해기업은 기준금리)",
+      "term": "5년(2년)",
+      "method": "직접대출",
+      "documentGroups": [
+        {
+          "stage": "기업정보입력",
+          "items": [
+            "대표자 신분증 사본(앞면)",
+            "사업자등록증",
+            "표준재무제표",
+            "원천세신고자료",
+            "신용정보 제공·활용 동의서"
+          ]
+        },
+        {
+          "stage": "융자신청",
+          "items": [
+            "사업자등록증명원",
+            "표준재무제표증명원",
+            "국세·지방세 납세증명서",
+            "4대보험 완납증명서",
+            "법인등기부등본",
+            "고용보험가입자명부"
+          ]
+        },
+        {
+          "stage": "해당 시",
+          "items": [
+            "시설자금 견적서·계약서·도면",
+            "자금별 요건 확인서류",
+            "우대금리 증빙"
+          ]
+        }
+      ],
+      "documentsNote": "[기업정보입력] 대표자 신분증 사본(앞면), 사업자등록증, 표준재무제표, 원천세신고자료, 신용정보 제공·활용 동의서 / [융자신청] 사업자등록증명원, 표준재무제표증명원, 국세·지방세 납세증명서, 4대보험 완납증명서, 법인등기부등본, 고용보험가입자명부 / 해당 시: 시설자금 견적서·계약서·도면, 자금별 요건 확인서류, 우대금리 증빙(kosmes.or.kr 융자절차 페이지 기준)",
+      "unconfirmed": {
+        "limit": false,
+        "rate": false,
+        "term": false
+      },
+      "forms": [],
+      "formNote": "융자신청서는 중진공 누리집에서 온라인 작성·제출(별도 다운로드 서식 없음)",
+      "changeMemo": "",
+      "pages": "p34-35",
+      "baseNotice": "중진공 제2026-574호(2026.10.1, 변경공고 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071549&parentSeq=1071549",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071549&cbIdx=310&streFileNm=142e9dab-f50f-470e-9a95-7bac4088ce38.pdf"
+    },
+    {
+      "id": "kosmes-08",
       "agency": "중진공",
       "agencyFull": "중진공(중소벤처기업진흥공단)",
       "group": "밸류체인안정화",
@@ -613,22 +929,55 @@ window.POLICY_FUND_DATA = {
       "targets": [
         "중소기업"
       ],
-      "conditions": "발주기업 추천 수주 중소기업 / 3개년 결산재무제표 보유 + 구매기업과 1년 이상 거래실적 중소기업",
-      "limit": "세부는 추후 공고(2026.1분기 예고)",
-      "rate": "-",
-      "term": "-",
-      "method": "-",
-      "documents": [],
-      "documentsNote": "신청서+증빙서류. 상담 후 개별 안내, 온라인 신청 시 대표자 신분증 진위확인 후 필수서류 자동제출(공고문 참고자료 p44-45)",
+      "conditions": "네트워크론: 동반성장 협약 발주기업 추천 수주 중소기업(최근 3개년 결산재무제표·1년 내 거래실적) / 팩토링: 3개년 결산재무제표 + 구매기업과 1년 이상 거래",
+      "limit": "공고문에 한도 미기재(미확인)",
+      "rate": "공고문에 금리 미기재(미확인)",
+      "term": "공고문에 기간 미기재(미확인)",
+      "method": "네트워크론: 발주서 기반 생산자금 대출 / 팩토링: 매출채권 상환청구권 없이 인수",
+      "documentGroups": [
+        {
+          "stage": "기업정보입력",
+          "items": [
+            "대표자 신분증 사본(앞면)",
+            "사업자등록증",
+            "표준재무제표",
+            "원천세신고자료",
+            "신용정보 제공·활용 동의서"
+          ]
+        },
+        {
+          "stage": "융자신청",
+          "items": [
+            "사업자등록증명원",
+            "표준재무제표증명원",
+            "국세·지방세 납세증명서",
+            "4대보험 완납증명서",
+            "법인등기부등본",
+            "고용보험가입자명부"
+          ]
+        },
+        {
+          "stage": "해당 시",
+          "items": [
+            "시설자금 견적서·계약서·도면",
+            "자금별 요건 확인서류",
+            "우대금리 증빙"
+          ]
+        }
+      ],
+      "documentsNote": "[기업정보입력] 대표자 신분증 사본(앞면), 사업자등록증, 표준재무제표, 원천세신고자료, 신용정보 제공·활용 동의서 / [융자신청] 사업자등록증명원, 표준재무제표증명원, 국세·지방세 납세증명서, 4대보험 완납증명서, 법인등기부등본, 고용보험가입자명부 / 해당 시: 시설자금 견적서·계약서·도면, 자금별 요건 확인서류, 우대금리 증빙(kosmes.or.kr 융자절차 페이지 기준)",
       "unconfirmed": {
         "limit": true,
         "rate": true,
         "term": true
       },
       "forms": [],
-      "pages": "p35-36",
-      "noticeUrl": "https://www.bizinfo.go.kr/web/lay1/bbs/S1T122C128/AS/74/view.do?pblancId=PBLN_000000000116941",
-      "pdfUrl": "https://www.bizinfo.go.kr/cmm/fms/fileDown.do?atchFileId=FILE_000000000739124&fileSn=0"
+      "formNote": "융자신청서는 중진공 누리집에서 온라인 작성·제출(별도 다운로드 서식 없음)",
+      "changeMemo": "",
+      "pages": "p36-37",
+      "baseNotice": "중진공 제2026-574호(2026.10.1, 변경공고 통합본)",
+      "noticeUrl": "https://www.mss.go.kr/site/smba/ex/bbs/View.do?cbIdx=310&bcIdx=1071549&parentSeq=1071549",
+      "pdfUrl": "https://www.mss.go.kr/common/board/Download.do?bcIdx=1071549&cbIdx=310&streFileNm=142e9dab-f50f-470e-9a95-7bac4088ce38.pdf"
     }
   ]
 };
