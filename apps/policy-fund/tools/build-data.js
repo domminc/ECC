@@ -44,8 +44,8 @@ const META = {
     중진공: { label: '중진공 융자절차 안내', url: 'https://www.kosmes.or.kr/nsh/SH/SBI/SHSBI003M0.do' }
   },
   applyUrls: [
-    { label: '소상공인정책자금 신청(소진공)', url: 'https://ols.semas.or.kr' },
-    { label: '중진공 정책자금 신청', url: 'https://www.kosmes.or.kr' }
+    { agency: '소진공', label: '소진공 온라인 신청', url: 'https://ols.semas.or.kr' },
+    { agency: '중진공', label: '중진공 온라인 신청', url: 'https://www.kosmes.or.kr' }
   ]
 };
 

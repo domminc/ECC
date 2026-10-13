@@ -52,6 +52,7 @@ function runTests() {
   }));
 
   results.push(test('meta links are https or empty with a label', () => {
+    assert.ok(built.meta.applyUrls.every(a => a.agency), 'apply links name their agency');
     for (const link of [...built.meta.changeNotices, ...built.meta.applyUrls]) {
       assert.ok(link.label, 'link needs a label');
       assert.ok(link.url === '' || /^https:\/\//.test(link.url), link.label);
@@ -105,7 +106,9 @@ function runTests() {
     const html = buildArtifactHtml();
     assert.ok(/^<title>[^<]+<\/title>/.test(html), 'starts with title');
     assert.ok(!/<(!doctype|html|head|body)[\s>]/i.test(html), 'no document wrapper');
-    assert.ok(!/<link\b|<script src=/i.test(html), 'no external files');
+    assert.ok(!/<script src=|href="(?!https:\/\/fonts\.(googleapis|gstatic)\.com)[^"]*\.css"/i.test(html), 'no external files');
+    const links = html.match(/<link\b[^>]*>/g) || [];
+    assert.ok(links.every(l => /href="https:\/\/fonts\.(googleapis|gstatic)\.com/.test(l)), 'only font links');
     assert.strictEqual((html.match(/window\.POLICY_FUND_DATA =/g) || []).length, 1);
     assert.ok(html.includes(built.funds[0].name));
     assert.ok(html.includes('id="fund-list"'));

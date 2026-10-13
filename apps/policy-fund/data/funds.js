@@ -32,11 +32,13 @@ window.POLICY_FUND_DATA = {
     },
     "applyUrls": [
       {
-        "label": "소상공인정책자금 신청(소진공)",
+        "agency": "소진공",
+        "label": "소진공 온라인 신청",
         "url": "https://ols.semas.or.kr"
       },
       {
-        "label": "중진공 정책자금 신청",
+        "agency": "중진공",
+        "label": "중진공 온라인 신청",
         "url": "https://www.kosmes.or.kr"
       }
     ]

@@ -19,12 +19,15 @@ const safe = text => text.replace(/<\/(script|style)/gi, '<\\/$1');
 function buildArtifactHtml() {
   const html = read('index.html');
   const title = html.match(/<title>([^<]+)<\/title>/)[1];
+  // Keep only remote font stylesheets from the head; local CSS and scripts are inlined below.
+  const remoteLinks = (html.match(/<link\b[^>]*href="https:[^"]*"[^>]*>/g) || []).join('\n');
   const bodyMarkup = html
     .match(/<body>([\s\S]*)<\/body>/)[1]
     .replace(/\s*<script src="[^"]+"><\/script>/g, '');
 
   return [
     `<title>${title}</title>`,
+    remoteLinks,
     `<style>\n${safe(read('styles.css'))}</style>`,
     bodyMarkup.trim(),
     `<script>\n${safe(read('data/funds.js'))}</script>`,
