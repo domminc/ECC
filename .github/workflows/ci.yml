@@ -26,13 +26,9 @@ jobs:
     # Actions minutes are billed per OS (Linux x1, Windows x2, macOS x10).
     # Pull requests run every Linux cell plus a representative Windows/macOS
     # subset; push (main, release/**, v* tags) and manual runs keep the full
-    # matrix. Skipped cells report as skipped (not pending), so required
-    # check names are unchanged.
-    if: >-
-      github.event_name != 'pull_request' ||
-      matrix.os == 'ubuntu-latest' ||
-      (matrix.os == 'windows-latest' && (matrix.pm == 'npm' || matrix.node == '20.x')) ||
-      (matrix.os == 'macos-latest' && matrix.node == '20.x' && matrix.pm == 'npm')
+    # matrix. The subset is expressed as extra excludes, chosen by event,
+    # because the matrix context is not available in a job-level if.
+    # The baseline exclude is: Bun has limited Windows support.
 
     strategy:
       fail-fast: false
@@ -40,10 +36,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         node: ['18.x', '20.x', '22.x']
         pm: [npm, pnpm, yarn, bun]
-        exclude:
-          # Bun has limited Windows support
-          - os: windows-latest
-            pm: bun
+        exclude: ${{ fromJSON(github.event_name == 'pull_request' && '[{"os":"windows-latest","pm":"bun"},{"os":"windows-latest","node":"18.x","pm":"pnpm"},{"os":"windows-latest","node":"18.x","pm":"yarn"},{"os":"windows-latest","node":"22.x","pm":"pnpm"},{"os":"windows-latest","node":"22.x","pm":"yarn"},{"os":"macos-latest","node":"18.x"},{"os":"macos-latest","node":"22.x"},{"os":"macos-latest","node":"20.x","pm":"pnpm"},{"os":"macos-latest","node":"20.x","pm":"yarn"},{"os":"macos-latest","node":"20.x","pm":"bun"}]' || '[{"os":"windows-latest","pm":"bun"}]') }}
 
     steps:
       - name: Checkout
