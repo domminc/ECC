@@ -545,14 +545,19 @@
     renderDraftPreview();
   });
   document.getElementById('draftCopyAll').addEventListener('click', (e) => copyText(DR.toText(lastDoc), e.currentTarget));
-  document.getElementById('draftDownload').addEventListener('click', () => {
-    const name = `사업계획서_초안_${(draft.input.company || '미입력').replace(/[\\/:*?"<>|\s]+/g, '_')}.doc`;
-    const url = URL.createObjectURL(new Blob([DR.toWordHtml(lastDoc)], { type: 'application/msword' }));
-    const a = h('a', { href: url, download: name });
-    document.body.append(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  document.getElementById('draftDownload').addEventListener('click', (e) => {
+    const btn = e.currentTarget;
+    const name = `사업계획서_초안_${(draft.input.company || '미입력').replace(/[\\/:*?"<>|\s]+/g, '_')}.docx`;
+    try {
+      const url = URL.createObjectURL(new Blob([window.PF_DOCX.buildDocx(lastDoc)], { type: window.PF_DOCX.MIME }));
+      const a = h('a', { href: url, download: name });
+      document.body.append(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (_err) {
+      btn.textContent = '문서를 만들지 못했습니다. 전체 텍스트 복사를 이용하세요';
+    }
   });
 
   /* ---------- 탭 ---------- */

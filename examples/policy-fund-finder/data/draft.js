@@ -241,29 +241,6 @@
     return [head].concat(doc.sections.map((s) => `\n${s.title}\n${sectionText(s)}`)).join('\n');
   }
 
-  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  function blockHtml(b) {
-    if (b.type === 'h') return `<p class="h">${esc(b.text)}</p>`;
-    if (b.type === 'p') return `<p>${esc(b.text).replace(/\n/g, '<br>')}</p>`;
-    if (b.type === 'kv') return `<table border="1" cellspacing="0" cellpadding="4">${b.rows.map((r) => `<tr><th>${esc(r[0])}</th><td>${esc(r[1])}</td></tr>`).join('')}</table>`;
-    if (b.type === 'table') {
-      return `<table border="1" cellspacing="0" cellpadding="4"><tr>${b.header.map((h) => `<th>${esc(h)}</th>`).join('')}</tr>${b.rows.map((r) => `<tr>${r.map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</table>`;
-    }
-    return '';
-  }
-  /** Word/한글에서 열리는 HTML 기반 .doc 본문 */
-  function toWordHtml(doc) {
-    const css = 'body{font-family:"맑은 고딕",sans-serif;font-size:10.5pt}h1{font-size:20pt;color:#1F4E79}h2{font-size:13pt;color:#1F4E79;margin-top:14pt}'
-      + 'table{border-collapse:collapse;width:100%;margin:4pt 0}th,td{border:1px solid #888;padding:4pt;text-align:left;vertical-align:top}th{background:#DCE6F1}'
-      + '.note{background:#EEF3F8;padding:6pt;color:#404040;font-size:9.5pt}.h{font-weight:bold;margin-top:8pt}';
-    return `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">`
-      + `<head><meta charset="utf-8"><title>${esc(doc.title)}</title><style>${css}</style></head><body>`
-      + `<h1>${esc(doc.title)}</h1><p>${esc(doc.subtitle)}</p>`
-      + `<p class="note">본 문서는 신청 준비용 초안이며 공식 서식이 아닙니다. 【작성 필요】 표시는 직접 채워야 하는 항목입니다. 실제 신청은 해당 기관의 온라인 시스템에서 입력·제출하세요.</p>`
-      + doc.sections.map((s) => `<h2>${esc(s.title)}</h2>${s.blocks.map(blockHtml).join('')}`).join('')
-      + '</body></html>';
-  }
-
   const EXAMPLES = {
     semas: {
       company: '예시분식', ceo: '홍길동', openDate: '2021-03-02', industryName: '음식점업 (분식)',
@@ -301,5 +278,5 @@
     },
   };
 
-  return { build, check, salesStats, planTotals, toText, sectionText, toWordHtml, num, won, EXAMPLES, INDUSTRY_LABEL };
+  return { build, check, salesStats, planTotals, toText, sectionText, num, won, EXAMPLES, INDUSTRY_LABEL };
 });

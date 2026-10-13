@@ -196,12 +196,61 @@ run('draft: sales-drop answer from the profile adds an auto note', () => {
   assert.ok(R.toText(doc).includes('15% 이상 감소'));
 });
 
-run('draft: Word HTML escapes user input', () => {
+const X = require(path.join(root, 'data', 'docx.js'));
+
+/** 압축 없는 ZIP 을 읽어 {이름: Buffer} 로 돌려준다 (CRC 도 검증) */
+function readStoredZip(bytes) {
+  const buf = Buffer.from(bytes);
+  const eocd = buf.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+  assert.ok(eocd >= 0, 'no end-of-central-directory');
+  const count = buf.readUInt16LE(eocd + 10);
+  let pos = buf.readUInt32LE(eocd + 16);
+  const files = {};
+  for (let i = 0; i < count; i++) {
+    assert.strictEqual(buf.readUInt32LE(pos), 0x02014b50);
+    const crc = buf.readUInt32LE(pos + 16);
+    const size = buf.readUInt32LE(pos + 20);
+    const nlen = buf.readUInt16LE(pos + 28);
+    const off = buf.readUInt32LE(pos + 42);
+    const name = buf.slice(pos + 46, pos + 46 + nlen).toString('utf8');
+    const lnlen = buf.readUInt16LE(off + 26);
+    const data = buf.slice(off + 30 + lnlen, off + 30 + lnlen + size);
+    assert.strictEqual(X.crc32(data), crc, `crc mismatch for ${name}`);
+    files[name] = data;
+    pos += 46 + nlen;
+  }
+  return files;
+}
+
+run('docx: crc32 matches the known check value', () => {
+  assert.strictEqual(X.crc32(Buffer.from('123456789')), 0xcbf43926);
+});
+
+run('docx: package has the required parts and valid CRCs', () => {
+  const doc = R.build(R.EXAMPLES.semas, fund('semas-general'), profileOf());
+  const files = readStoredZip(X.buildDocx(doc));
+  for (const n of ['[Content_Types].xml', '_rels/.rels', 'word/document.xml', 'word/styles.xml', 'word/_rels/document.xml.rels']) {
+    assert.ok(files[n], `missing ${n}`);
+  }
+  const xml = files['word/document.xml'].toString('utf8');
+  assert.ok(xml.includes('사업계획서 (소상공인용)'));
+  assert.ok(xml.includes('180,000,000원'));
+});
+
+run('docx: user input is XML-escaped and control characters are dropped', () => {
   const input = clone(R.EXAMPLES.semas);
-  input.company = '<script>alert(1)</script>';
-  const html = R.toWordHtml(R.build(input, fund('semas-general'), profileOf()));
-  assert.ok(!html.includes('<script>'));
-  assert.ok(html.includes('&lt;script&gt;'));
+  input.company = '<w:evil/>&"x"\u0001';
+  input.strengths = '첫 줄\n둘째 줄';
+  const xml = readStoredZip(X.buildDocx(R.build(input, fund('semas-general'), profileOf())))['word/document.xml'].toString('utf8');
+  assert.ok(!xml.includes('<w:evil/>'));
+  assert.ok(xml.includes('&lt;w:evil/&gt;&amp;"x"'));
+  assert.ok(!xml.includes('\u0001'));
+  assert.ok(xml.includes('<w:br/>'));
+});
+
+run('docx: placeholders are highlighted so they stand out in Word', () => {
+  const xml = readStoredZip(X.buildDocx(R.build({ sales: [], plan: [] }, fund('semas-general'), profileOf())))['word/document.xml'].toString('utf8');
+  assert.ok(xml.includes('<w:highlight w:val="yellow"/>'));
 });
 
 run('draft: every fund with limitWon has sane numeric values', () => {
