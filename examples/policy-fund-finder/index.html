@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>정책자금 길잡이</title>
+  <meta name="description" content="소상공인·중소기업 정책자금의 종류, 신청 조건, 필요 서류를 한 화면에서 확인하고 작성 양식을 내려받는 도구">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-inner">
+      <div>
+        <h1>정책자금 길잡이</h1>
+        <p class="lede">소상공인·중소기업이 받을 수 있는 정책자금의 종류, 신청 조건, 필요 서류를 한 곳에서 확인합니다.</p>
+      </div>
+      <dl class="basis" aria-label="자료 기준">
+        <div><dt>소진공 공고</dt><dd>제2025-656호 · 3차 변경(2026.07.10)</dd></div>
+        <div><dt>중진공 공고</dt><dd>제2025-649호 · 변경(2026.07.28)</dd></div>
+        <div><dt>접수현황 확인일</dt><dd id="asOf">2026-10-13</dd></div>
+      </dl>
+    </div>
+    <div class="wrap">
+      <p class="notice" role="note">참고용 안내입니다. 금리는 분기마다 바뀌고 공고는 수시로 변경됩니다. 신청 전에 각 기관의 최신 공고와 접수 일정을 확인하세요. 심사 결과를 보장하지 않습니다.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="메뉴">
+    <div class="wrap tabs-inner" role="tablist">
+      <button role="tab" id="tab-finder" aria-controls="panel-finder" aria-selected="true" data-tab="finder">내게 맞는 자금</button>
+      <button role="tab" id="tab-list" aria-controls="panel-list" aria-selected="false" data-tab="list">전체 자금 비교</button>
+      <button role="tab" id="tab-docs" aria-controls="panel-docs" aria-selected="false" data-tab="docs">서류 · 양식</button>
+      <button role="tab" id="tab-schedule" aria-controls="panel-schedule" aria-selected="false" data-tab="schedule">접수 일정 · 문의</button>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <section id="panel-finder" role="tabpanel" aria-labelledby="tab-finder">
+      <div class="finder">
+        <form id="profile" class="profile" autocomplete="off">
+          <p class="example-note" id="exampleNote">예시 값으로 시작했습니다. 내 사업 정보로 바꾸면 결과가 바로 바뀝니다.</p>
+
+          <fieldset>
+            <legend>사업 현황</legend>
+            <div class="radio-row" role="radiogroup" aria-label="사업 상태">
+              <label><input type="radio" name="bizStatus" value="operating"> 사업 중</label>
+              <label><input type="radio" name="bizStatus" value="prospective"> 예비창업자</label>
+            </div>
+            <label class="field" for="industry">업종
+              <select id="industry" name="industry">
+                <option value="mfg">제조업</option>
+                <option value="construction">건설업</option>
+                <option value="transport">운수업</option>
+                <option value="mining">광업</option>
+                <option value="wholesale_retail">도·소매업</option>
+                <option value="food_lodging">음식·숙박업</option>
+                <option value="service">서비스업</option>
+                <option value="other">그 밖의 업종</option>
+              </select>
+            </label>
+            <div class="two">
+              <label class="field" for="employees">상시근로자 수(명)
+                <input id="employees" name="employees" type="number" min="0" step="1" inputmode="numeric">
+              </label>
+              <label class="field" for="years">업력(년)
+                <input id="years" name="years" type="number" min="0" step="0.5" inputmode="decimal">
+              </label>
+            </div>
+            <label class="field" for="need">필요한 자금
+              <select id="need" name="need">
+                <option value="working">운전자금 (재료비·인건비·임차료 등)</option>
+                <option value="facility">시설자금 (설비·사업장)</option>
+                <option value="both">둘 다</option>
+              </select>
+            </label>
+            <p class="derived" id="derived" aria-live="polite"></p>
+          </fieldset>
+
+          <fieldset>
+            <legend>신용 · 수출 · 매출</legend>
+            <label class="field" for="ncb">신용점수 (NCB)
+              <select id="ncb" name="ncb">
+                <option value="unknown">모름</option>
+                <option value="le839">839점 이하</option>
+                <option value="mid">840~919점</option>
+                <option value="ge920">920점 이상</option>
+              </select>
+            </label>
+            <label class="field" for="exportLevel">최근 1년 수출실적
+              <select id="exportLevel" name="exportLevel">
+                <option value="none">없음</option>
+                <option value="lt100k">10만불 미만</option>
+                <option value="gte100k">10만불 이상</option>
+              </select>
+            </label>
+            <label class="field" for="salesDrop">직전 대비 매출 감소
+              <select id="salesDrop" name="salesDrop">
+                <option value="none">10% 미만 또는 없음</option>
+                <option value="10">10% 이상 ~ 15% 미만</option>
+                <option value="15">15% 이상</option>
+              </select>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>해당되는 것을 모두 선택</legend>
+            <div class="chips" id="flagChips"></div>
+          </fieldset>
+
+          <fieldset>
+            <legend>융자제한 점검</legend>
+            <p class="hint">해당하면 체크하세요. 대부분의 자금에서 신청이 제한되거나 예외 확인이 필요합니다.</p>
+            <div class="chips" id="exclChips"></div>
+          </fieldset>
+
+          <button type="button" class="ghost" id="resetProfile">입력 초기화</button>
+        </form>
+
+        <div class="results" aria-live="polite">
+          <div class="results-head">
+            <h2>진단 결과</h2>
+            <p id="resultCount" class="count"></p>
+          </div>
+          <div id="results"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-list" role="tabpanel" aria-labelledby="tab-list" hidden>
+      <div class="toolbar">
+        <label class="field inline" for="fAgency">기관
+          <select id="fAgency"><option value="">전체</option><option value="semas">소진공 (소상공인)</option><option value="kosmes">중진공 (중소기업)</option></select>
+        </label>
+        <label class="field inline" for="fMethod">대출 방식
+          <select id="fMethod"><option value="">전체</option><option value="직접">직접대출</option><option value="대리">대리대출</option><option value="이차보전">이차보전</option></select>
+        </label>
+        <label class="field inline" for="fUse">용도
+          <select id="fUse"><option value="">전체</option><option value="운전">운전자금</option><option value="시설">시설자금</option></select>
+        </label>
+        <label class="field inline grow" for="fText">검색
+          <input id="fText" type="search" placeholder="자금명·대상·키워드">
+        </label>
+      </div>
+      <p id="listCount" class="count"></p>
+      <div class="table-scroll">
+        <table class="funds" id="fundTable">
+          <thead><tr><th scope="col">자금</th><th scope="col">방식</th><th scope="col">한도</th><th scope="col">금리</th><th scope="col">기간</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="panel-docs" role="tabpanel" aria-labelledby="tab-docs" hidden>
+      <h2>작성 양식 · 작성예시</h2>
+      <p class="sub">빈 양식과 가상 데이터로 채운 작성예시를 함께 내려받을 수 있습니다. 공식 서식이 아닌 준비용 양식입니다.</p>
+      <div class="forms" id="formsGrid"></div>
+
+      <h2>필요 서류 한눈에</h2>
+      <p class="sub"><span class="tag official">공고·안내 명시</span>는 공고나 이용안내서에 적힌 항목입니다. <span class="tag typical">일반 요구</span>는 흔히 요구되지만 자금·창구에 따라 달라질 수 있어, 신청 화면의 "필수" 표시가 최종 기준입니다.</p>
+      <div id="docGroups"></div>
+    </section>
+
+    <section id="panel-schedule" role="tabpanel" aria-labelledby="tab-schedule" hidden>
+      <h2>소진공 접수 현황</h2>
+      <p class="sub" id="scheduleSub"></p>
+      <div class="table-scroll">
+        <table class="funds" id="scheduleTable">
+          <thead><tr><th scope="col">구분</th><th scope="col">자금</th><th scope="col">접수기간</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="sub">중진공은 지역본·지부별로 월별 신청 일정과 신청 가능 자금을 중진공 누리집에서 공지합니다. 재도약지원자금, 긴급경영안정자금(재해) 등은 수시 접수가 가능합니다.</p>
+
+      <h2>문의처</h2>
+      <ul class="contact" id="contactList"></ul>
+
+      <h2>공식 사이트</h2>
+      <ul class="links" id="linkList"></ul>
+
+      <aside class="warn">
+        <h3>불법 브로커 주의</h3>
+        <p>정책자금은 대표자 본인이 직접 신청하는 것이 원칙입니다. 수수료를 받고 신청을 대행해 준다는 제안은 불법 브로커일 수 있습니다. 소상공인정책자금 사이트에 불법 브로커 신고센터가 있습니다.</p>
+      </aside>
+    </section>
+  </main>
+
+  <dialog id="detail" aria-labelledby="detailTitle">
+    <div class="dialog-body" id="detailBody"></div>
+  </dialog>
+
+  <footer class="foot">
+    <div class="wrap">
+      <h2>자료 출처</h2>
+      <ul id="sourceList"></ul>
+      <p>이 도구는 위 공고·안내를 정리한 것이며 정부 기관과 무관합니다. 문서 서식은 공식 서식이 아닙니다.</p>
+    </div>
+  </footer>
+
+  <script src="data/funds.js"></script>
+  <script src="data/eligibility.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
