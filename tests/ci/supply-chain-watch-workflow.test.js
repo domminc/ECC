@@ -36,7 +36,7 @@ function run() {
   let failed = 0;
 
   if (test('runs on schedule and manual dispatch', () => {
-    assert.match(source, /schedule:\r?\n\s+- cron: '17 \*\/6 \* \* \*'/);
+    assert.match(source, /schedule:\r?\n\s+- cron: '17 \*\/12 \* \* \*'/);
     assert.match(source, /workflow_dispatch:/);
   })) passed++; else failed++;
 
