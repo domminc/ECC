@@ -32,7 +32,7 @@ module.exports = [
         }
     },
     {
-        files: ['apps/policy-fund/app.js', 'apps/policy-fund/data/funds.js'],
+        files: ['apps/policy-fund/*.js', 'apps/policy-fund/data/funds.js'],
         languageOptions: {
             sourceType: 'script',
             globals: {

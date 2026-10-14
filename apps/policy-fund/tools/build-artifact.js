@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Bundle the page into one HTML file (CSS, data and JS inlined) for publishing
+ * Bundle the page into one HTML file (CSS, fonts, data, scripts and form files inlined) for publishing
  * as a Claude Artifact. The output has no doctype/html/head/body wrapper
  * because the Artifact host adds its own skeleton.
  *
@@ -24,6 +24,22 @@ function inlineFonts(css) {
   });
 }
 
+// Plain download links are blocked inside the Artifact viewer, so the form files travel with the page as base64.
+function formFiles() {
+  const data = JSON.parse(read('data/funds.json'));
+  const files = {};
+  data.forms.forEach(form => {
+    [form.blank, form.sample].filter(Boolean).forEach(v => {
+      files[v.file] = fs.readFileSync(path.join(APP_DIR, v.file)).toString('base64');
+    });
+  });
+  return files;
+}
+
+function scriptSources(html) {
+  return Array.from(html.matchAll(/<script src="([^"]+)"><\/script>/g), m => m[1]);
+}
+
 function buildArtifactHtml() {
   const html = read('index.html');
   const title = html.match(/<title>([^<]+)<\/title>/)[1];
@@ -32,14 +48,15 @@ function buildArtifactHtml() {
   const bodyMarkup = html
     .match(/<body>([\s\S]*)<\/body>/)[1]
     .replace(/\s*<script src="[^"]+"><\/script>/g, '');
+  const scripts = scriptSources(html);
 
   return [
     `<title>${title}</title>`,
     remoteLinks,
     `<style>\n${safe(inlineFonts(read('styles.css')))}</style>`,
     bodyMarkup.trim(),
-    `<script>\n${safe(read('data/funds.js'))}</script>`,
-    `<script>\n${safe(read('app.js'))}</script>`,
+    `<script>\nwindow.PF_FORM_FILES = ${JSON.stringify(formFiles())};\n</script>`,
+    ...scripts.map(src => `<script>\n${safe(read(src))}</script>`),
     ''
   ].join('\n');
 }
@@ -54,4 +71,4 @@ if (require.main === module) {
   console.log(`Wrote ${out}`);
 }
 
-module.exports = { buildArtifactHtml };
+module.exports = { buildArtifactHtml, scriptSources, formFiles };
