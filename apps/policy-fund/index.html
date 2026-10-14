@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>정책자금 한눈에 보기</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">본문으로 건너뛰기</a>
+
+  <header class="masthead">
+    <div class="wrap masthead-inner">
+      <div class="masthead-copy">
+        <p class="eyebrow">2026 정책자금 · 소진공 · 중진공</p>
+        <h1 id="page-title">정책자금 한눈에 보기</h1>
+        <p class="lede">공식 공고를 기준으로 신청 조건, 한도, 금리, 필요 서류를 비교하고, 내게 맞는 자금 진단과 사업계획서 초안까지 이어서 준비합니다.</p>
+        <p class="asof"><span class="stamp" id="as-of"></span><span id="basis"></span></p>
+      </div>
+      <nav class="sources" aria-label="근거 공고">
+        <p class="sources-title">근거 공고</p>
+        <ul id="sources"></ul>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="views" aria-label="화면 전환">
+    <div class="wrap">
+      <div class="views-inner" role="tablist" aria-label="화면">
+        <button type="button" role="tab" id="tab-list" aria-controls="view-list" aria-selected="true" data-view="list">자금 목록</button>
+        <button type="button" role="tab" id="tab-finder" aria-controls="view-finder" aria-selected="false" tabindex="-1" data-view="finder">내게 맞는 자금</button>
+        <button type="button" role="tab" id="tab-draft" aria-controls="view-draft" aria-selected="false" tabindex="-1" data-view="draft">사업계획서 초안</button>
+        <button type="button" role="tab" id="tab-docs" aria-controls="view-docs" aria-selected="false" tabindex="-1" data-view="docs">서류·양식</button>
+        <button type="button" role="tab" id="tab-schedule" aria-controls="view-schedule" aria-selected="false" tabindex="-1" data-view="schedule">일정·문의</button>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main" tabindex="-1">
+    <!-- 1. 자금 목록 -->
+    <section class="view" id="view-list" role="tabpanel" aria-labelledby="tab-list">
+      <div class="wrap shell" id="shell" data-filters="closed">
+        <div class="notices">
+          <details class="notice" id="notice">
+            <summary><span id="notice-title">유의사항</span></summary>
+            <ul id="caveats"></ul>
+          </details>
+          <details class="notice" id="recon">
+            <summary><span id="recon-title">자료 대조 메모</span></summary>
+            <div class="recon-body">
+              <p class="recon-lead">최신 공고 정리본(CSV)과 이전 정리본이 겹치는 자금은 최신 값을 따랐습니다. 아래는 어느 쪽 값인지 확정하지 못했거나 한쪽에만 있는 항목입니다.</p>
+              <ul id="recon-list"></ul>
+            </div>
+          </details>
+        </div>
+
+        <div class="toolbar">
+          <label class="search" for="q">
+            <span class="visually-hidden">자금명이나 조건으로 검색</span>
+            <svg class="search-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+              <circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
+              <path d="M12.8 12.8 17 17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+            </svg>
+            <input id="q" type="search" placeholder="자금명, 조건으로 검색" autocomplete="off">
+          </label>
+          <button id="filter-toggle" class="filter-toggle" type="button" aria-expanded="false" aria-controls="filters">
+            필터<span id="filter-badge" class="filter-badge" hidden></span>
+          </button>
+        </div>
+
+        <aside id="filters" class="filters" aria-label="필터">
+          <div class="facet" id="facet-agency"></div>
+          <div class="facet" id="facet-target"></div>
+          <div class="facet facet--group" id="facet-group"></div>
+          <div class="facet" id="facet-basis"></div>
+          <div class="facet facet--changed" id="facet-changed"></div>
+          <button id="reset" class="link-btn" type="button" hidden>필터 초기화</button>
+        </aside>
+
+        <section class="results" aria-labelledby="results-title">
+          <div class="results-head">
+            <h2 id="results-title">정책자금</h2>
+            <p id="count" class="count" aria-live="polite"></p>
+            <p class="legend">
+              <span class="legend-item"><span class="flag flag--change">변경</span>최초 공고와 달라진 자금</span>
+              <span class="legend-item"><span class="flag flag--check">확인 필요</span>공고문에 없거나 값이 엇갈리는 항목</span>
+              <span class="legend-item"><span class="flag flag--legacy">이전 공고 기준</span>최신 공고 대조 미확인</span>
+            </p>
+          </div>
+          <ul id="fund-list" class="fund-list"></ul>
+          <div id="empty" class="empty" hidden>
+            <p>조건에 맞는 정책자금이 없습니다.</p>
+            <button id="empty-reset" class="btn btn--secondary" type="button">필터 초기화</button>
+          </div>
+        </section>
+
+        <article id="detail" class="detail" aria-labelledby="detail-title"></article>
+      </div>
+    </section>
+
+    <!-- 2. 내게 맞는 자금 -->
+    <section class="view" id="view-finder" role="tabpanel" aria-labelledby="tab-finder" hidden>
+      <div class="wrap shell shell--finder" id="shell-finder" data-panel="closed">
+        <div class="notices">
+          <p class="note-box" id="finder-basis" role="note"></p>
+        </div>
+
+        <div class="toolbar toolbar--finder">
+          <button id="profile-toggle" class="profile-toggle" type="button" aria-expanded="false" aria-controls="profile">
+            <span class="profile-toggle-label">내 사업 정보</span>
+            <span class="profile-toggle-sum" id="profile-sum"></span>
+          </button>
+        </div>
+
+        <form id="profile" class="profile" autocomplete="off" aria-label="내 사업 정보">
+          <p class="example-note" id="example-note" role="note">예시 값으로 시작했습니다. 내 사업 정보로 바꾸면 결과가 바로 바뀝니다.</p>
+
+          <fieldset>
+            <legend>사업 현황</legend>
+            <div class="radio-row" role="radiogroup" aria-label="사업 상태">
+              <label class="radio"><input type="radio" name="bizStatus" value="operating"><span>사업 중</span></label>
+              <label class="radio"><input type="radio" name="bizStatus" value="prospective"><span>예비창업자</span></label>
+            </div>
+            <label class="field" for="industry">업종
+              <select id="industry" name="industry">
+                <option value="mfg">제조업</option>
+                <option value="construction">건설업</option>
+                <option value="transport">운수업</option>
+                <option value="mining">광업</option>
+                <option value="wholesale_retail">도·소매업</option>
+                <option value="food_lodging">음식·숙박업</option>
+                <option value="service">서비스업</option>
+                <option value="other">그 밖의 업종</option>
+              </select>
+            </label>
+            <div class="two">
+              <label class="field" for="employees">상시근로자 수(명)
+                <input id="employees" name="employees" type="number" min="0" step="1" inputmode="numeric">
+              </label>
+              <label class="field" for="years">업력(년)
+                <input id="years" name="years" type="number" min="0" step="0.5" inputmode="decimal">
+              </label>
+            </div>
+            <label class="field" for="need">필요한 자금
+              <select id="need" name="need">
+                <option value="working">운전자금 (재료비·인건비·임차료 등)</option>
+                <option value="facility">시설자금 (설비·사업장)</option>
+                <option value="both">둘 다</option>
+              </select>
+            </label>
+            <p class="derived" id="derived" aria-live="polite"></p>
+          </fieldset>
+
+          <fieldset>
+            <legend>신용·수출·매출</legend>
+            <label class="field" for="ncb">신용점수 (NCB)
+              <select id="ncb" name="ncb">
+                <option value="unknown">모름</option>
+                <option value="le839">839점 이하</option>
+                <option value="mid">840~919점</option>
+                <option value="ge920">920점 이상</option>
+              </select>
+            </label>
+            <label class="field" for="exportLevel">최근 1년 수출실적
+              <select id="exportLevel" name="exportLevel">
+                <option value="none">없음</option>
+                <option value="lt100k">10만불 미만</option>
+                <option value="gte100k">10만불 이상</option>
+              </select>
+            </label>
+            <label class="field" for="salesDrop">직전 대비 매출 감소
+              <select id="salesDrop" name="salesDrop">
+                <option value="none">10% 미만 또는 없음</option>
+                <option value="10">10% 이상 15% 미만</option>
+                <option value="15">15% 이상</option>
+              </select>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>해당되는 것을 모두 선택</legend>
+            <div class="chips" id="flag-chips"></div>
+          </fieldset>
+
+          <fieldset>
+            <legend>융자제한 점검</legend>
+            <p class="hint">해당하면 체크하세요. 대부분의 자금에서 신청이 제한되거나 예외 확인이 필요합니다.</p>
+            <div class="chips" id="excl-chips"></div>
+          </fieldset>
+
+          <button type="button" class="link-btn" id="profile-reset">입력 초기화</button>
+        </form>
+
+        <section class="results" aria-labelledby="finder-results-title">
+          <div class="results-head">
+            <h2 id="finder-results-title">진단 결과</h2>
+            <p id="finder-count" class="count" aria-live="polite"></p>
+          </div>
+          <div id="finder-results"></div>
+        </section>
+
+        <article id="detail-finder" class="detail" aria-label="자금 상세"></article>
+      </div>
+    </section>
+
+    <!-- 3. 사업계획서 초안 -->
+    <section class="view" id="view-draft" role="tabpanel" aria-labelledby="tab-draft" hidden>
+      <div class="wrap draft" id="draft" data-pane="form">
+        <div class="pane-switch" role="group" aria-label="입력과 미리보기">
+          <button type="button" class="pane-btn" data-pane-btn="form" aria-pressed="true">입력</button>
+          <button type="button" class="pane-btn" data-pane-btn="preview" aria-pressed="false">미리보기<span class="pane-badge" id="draft-missing-badge" hidden></span></button>
+        </div>
+
+        <form id="draft-form" class="profile draft-form" autocomplete="off" aria-label="사업계획서 입력">
+          <p class="example-note" id="draft-example" role="note">가상의 예시 데이터로 채워 두었습니다. 내 정보로 바꾸면 미리보기가 바로 바뀝니다.</p>
+          <div class="draft-tools">
+            <button type="button" class="link-btn" id="draft-clear">모두 비우기</button>
+            <button type="button" class="link-btn" id="draft-load" hidden>예시 불러오기</button>
+          </div>
+
+          <fieldset>
+            <legend>어떤 자금용 초안인가요</legend>
+            <label class="field" for="d-fund">대상 자금
+              <select id="d-fund" data-k="fundId"></select>
+            </label>
+            <p class="derived" id="d-profile-note"></p>
+          </fieldset>
+
+          <fieldset>
+            <legend>업체 정보</legend>
+            <div class="two">
+              <label class="field" for="d-company">상호<input id="d-company" data-k="company" type="text"></label>
+              <label class="field" for="d-ceo">대표자<input id="d-ceo" data-k="ceo" type="text"></label>
+            </div>
+            <div class="two">
+              <label class="field" for="d-open">개업(설립)일자<input id="d-open" data-k="openDate" type="date"></label>
+              <label class="field" for="d-industry">업종명<input id="d-industry" data-k="industryName" type="text" placeholder="예: 음식점업 (분식)"></label>
+            </div>
+            <label class="field" for="d-address">사업장 주소<input id="d-address" data-k="address" type="text"></label>
+            <label class="field" for="d-mainbiz">주요 사업내용 (한 줄)<input id="d-mainbiz" data-k="mainBiz" type="text"></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>연도별 실적 (원)</legend>
+            <p class="hint">최근 3개년 매출을 입력하면 평균과 전년 대비 증감을 자동 계산합니다.</p>
+            <div id="sales-rows" class="rows"></div>
+          </fieldset>
+
+          <fieldset data-agency="semas">
+            <legend>영업현황</legend>
+            <label class="field" for="d-products">상품·서비스 (한 줄에 하나: 상품 | 판매 방식 | 매출 비중 | 가격)
+              <textarea id="d-products" data-k="products" rows="3"></textarea></label>
+            <label class="field" for="d-customers">주요 고객과 거래처<textarea id="d-customers" data-k="customers" rows="2"></textarea></label>
+            <label class="field" for="d-strengths">경쟁 환경과 강점<textarea id="d-strengths" data-k="strengths" rows="2"></textarea></label>
+            <label class="field" for="d-changes">최근 매출 변동과 원인<textarea id="d-changes" data-k="changes" rows="2"></textarea></label>
+          </fieldset>
+
+          <fieldset data-agency="kosmes">
+            <legend>사업·기술·고용</legend>
+            <label class="field" for="d-tech">제품·보유 기술 (특허·인증·R&amp;D)<textarea id="d-tech" data-k="tech" rows="3"></textarea></label>
+            <label class="field" for="d-market">시장·고객·수주 현황<textarea id="d-market" data-k="market" rows="3"></textarea></label>
+            <label class="field" for="d-hiring">고용·수출 계획<textarea id="d-hiring" data-k="hiring" rows="2"></textarea></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>대표자 경력</legend>
+            <label class="field" for="d-careers">한 줄에 하나: 기간 | 근무처 | 담당 업무
+              <textarea id="d-careers" data-k="careers" rows="3"></textarea></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>자금집행계획</legend>
+            <label class="field" for="d-apply">신청 금액 (원)
+              <input id="d-apply" data-k="applyAmount" type="number" min="0" step="1000000" inputmode="numeric"></label>
+            <div id="plan-rows" class="rows"></div>
+            <button type="button" class="btn btn--secondary btn--small" id="plan-add">행 추가</button>
+            <p class="derived" id="d-plan-sum" aria-live="polite"></p>
+          </fieldset>
+
+          <fieldset>
+            <legend>상환 계획</legend>
+            <label class="field" for="d-repay">상환 재원과 월 상환 가능 금액<textarea id="d-repay" data-k="repay" rows="3"></textarea></label>
+          </fieldset>
+        </form>
+
+        <section class="results draft-preview-pane" aria-labelledby="draft-preview-title">
+          <div class="results-head">
+            <h2 id="draft-preview-title">초안 미리보기</h2>
+            <p id="draft-missing" class="count" aria-live="polite"></p>
+          </div>
+          <ul id="draft-issues" class="issues"></ul>
+          <div class="btn-row draft-actions" id="draft-actions"></div>
+          <p class="src">직접 입력한 사실만 반영하고, 비어 있는 항목은 【작성 필요】로 남깁니다. 소진공은 각 절의 [복사]를 눌러 사업계획서 웹폼(영업현황·경력·자금집행계획)에 붙여 넣으세요.</p>
+          <p class="note-box" id="draft-disclaimer" role="note"></p>
+          <div id="draft-preview" class="preview"></div>
+        </section>
+      </div>
+    </section>
+
+    <!-- 4. 서류·양식 -->
+    <section class="view" id="view-docs" role="tabpanel" aria-labelledby="tab-docs" hidden>
+      <div class="wrap page">
+        <div class="page-head">
+          <h2>작성 양식·작성예시</h2>
+          <p class="note-box" id="docs-disclaimer" role="note"></p>
+          <p class="save-note" id="save-note" hidden></p>
+        </div>
+        <div class="forms" id="forms-grid"></div>
+
+        <div class="page-head">
+          <h2>필요 서류 한눈에</h2>
+          <p class="lead"><span class="tag tag--official">공고·안내 명시</span>는 공고나 이용안내서에 적힌 항목입니다. <span class="tag tag--typical">일반 요구</span>는 흔히 요구되지만 자금·창구에 따라 달라질 수 있어, 신청 화면의 "필수" 표시가 최종 기준입니다.</p>
+        </div>
+        <div id="doc-groups"></div>
+      </div>
+    </section>
+
+    <!-- 5. 일정·문의 -->
+    <section class="view" id="view-schedule" role="tabpanel" aria-labelledby="tab-schedule" hidden>
+      <div class="wrap page">
+        <div class="page-head">
+          <h2>소진공 접수 현황</h2>
+          <p class="lead" id="schedule-sub"></p>
+        </div>
+        <div class="table-scroll">
+          <table class="plain" id="schedule-table">
+            <thead><tr><th scope="col">구분</th><th scope="col">자금</th><th scope="col">접수기간</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="lead">중진공은 지역본·지부별로 월별 신청 일정과 신청 가능 자금을 중진공 누리집에서 공지합니다. 재도약지원자금, 긴급경영안정자금(재해) 등은 수시 접수가 가능합니다.</p>
+
+        <div class="page-head"><h2>문의처</h2></div>
+        <ul class="contacts" id="contact-list"></ul>
+
+        <div class="page-head"><h2>공식 사이트</h2></div>
+        <ul class="site-links" id="link-list"></ul>
+
+        <aside class="warn-box">
+          <h3>불법 브로커 주의</h3>
+          <p>정책자금은 대표자 본인이 직접 신청하는 것이 원칙입니다. 수수료를 받고 신청을 대행해 준다는 제안은 불법 브로커일 수 있습니다. 소상공인정책자금 사이트에 불법 브로커 신고센터가 있습니다.</p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap site-foot">
+    <p id="apply-links"></p>
+    <p id="foot-disclaimer"></p>
+    <p>이 화면은 공식 공고를 정리한 참고 자료이며 정부 기관과 무관합니다. 신청 전에 기관 안내와 공고 원문을 확인하세요.</p>
+  </footer>
+
+  <script src="data/funds.js"></script>
+  <script src="lib/eligibility.js"></script>
+  <script src="lib/draft.js"></script>
+  <script src="lib/docx.js"></script>
+  <script src="core.js"></script>
+  <script src="detail.js"></script>
+  <script src="list-view.js"></script>
+  <script src="finder-view.js"></script>
+  <script src="draft-view.js"></script>
+  <script src="docs-view.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
